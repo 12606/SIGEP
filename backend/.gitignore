@@ -1,0 +1,10 @@
+.venv/
+.env
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.coverage
+.vscode/.ropeproject/
+*.sqlite3
+*.log
+.DS_Store
