@@ -1,7 +1,5 @@
 # SIGEP — Backend Django (primera etapa: autenticacion)
 
-Este ZIP esta pensado para copiar la carpeta `backend` dentro del repositorio `SIGEP`. **No sobrescribas tus otros archivos sin revisar**. Los datos son para desarrollo local; no subir `.env` a GitHub.
-
 ## 1. Crear rama desde la raiz del repositorio
 ```powershell
 cd C:\Users\Fercu\Documents\GitHub\SIGEP
