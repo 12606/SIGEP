@@ -1,0 +1,300 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SIGEP | Dulce Encanto - Acceso y registro</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        bakery: {
+                            vanilla: '#FFF5E4',
+                            pink: '#FF94B7',
+                            pinkHover: '#F7709D',
+                            brown: '#5C3D2E',
+                            brownLight: '#8B5E3C',
+                            cream: '#FFE3E1',
+                        }
+                    },
+                    fontFamily: {
+                        'sans': ['Nunito', 'sans-serif'],
+                        'cursive': ['Dancing Script', 'cursive'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* Animaciones personalizadas */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-8px); }
+            100% { transform: translateY(0px); }
+        }
+
+        .animate-fade-in-up {
+            opacity: 0;
+            animation: fadeInUp 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        .animate-float {
+            animation: float 4s ease-in-out infinite;
+        }
+
+        /* Retrasos para la animación en cascada */
+        .delay-100 { animation-delay: 100ms; }
+        .delay-200 { animation-delay: 200ms; }
+        .delay-300 { animation-delay: 300ms; }
+        .delay-400 { animation-delay: 400ms; }
+        .delay-500 { animation-delay: 500ms; }
+
+        /* Estilos base para el input auto-completado de Webkit */
+        input:-webkit-autofill,
+        input:-webkit-autofill:hover, 
+        input:-webkit-autofill:focus, 
+        input:-webkit-autofill:active{
+            -webkit-box-shadow: 0 0 0 30px white inset !important;
+            -webkit-text-fill-color: #5C3D2E !important;
+            transition: background-color 5000s ease-in-out 0s;
+        }
+    </style>
+</head>
+<body class="bg-bakery-vanilla min-h-screen flex items-center justify-center p-4 selection:bg-bakery-pink selection:text-white relative overflow-x-hidden">
+    
+    <!-- Elementos decorativos de fondo (Círculos abstractos) -->
+    <div class="absolute top-[-10%] left-[-10%] w-64 h-64 rounded-full bg-bakery-cream opacity-50 blur-3xl animate-float"></div>
+    <div class="absolute bottom-[-10%] right-[-5%] w-80 h-80 rounded-full bg-pink-100 opacity-60 blur-3xl animate-float" style="animation-delay: 2s;"></div>
+
+    <!-- Contenedor principal de la tarjeta -->
+    <main id="auth-card" class="w-full max-w-md bg-white rounded-[2.5rem] shadow-[0_20px_50px_-12px_rgba(255,148,183,0.3)] relative z-10 animate-fade-in-up overflow-hidden">
+        
+        <!-- Contenedor Flex para el Deslizamiento -->
+        <div id="form-slider" class="flex w-[200%] transition-transform duration-500 ease-in-out transform translate-x-0">
+            
+            <!-- ===================== -->
+            <!-- FORMULARIO DE LOGIN   -->
+            <!-- ===================== -->
+            <div class="w-1/2 p-8 sm:p-10 flex flex-col justify-center">
+                <!-- Icono de Cupcake y Título -->
+                <div class="text-center mb-8">
+                    <div class="inline-flex items-center justify-center w-16 h-16 bg-bakery-cream rounded-full mb-4 shadow-inner">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-8 h-8 text-bakery-pink">
+                            <path d="M12 2C10.5 2 9 3 9 4.5C9 5 9.2 5.5 9.5 5.8C8 6.5 7 8 7 9.5C7 10.3 7.3 11 7.7 11.5C6.7 12.2 6 13.5 6 15H18C18 13.5 17.3 12.2 16.3 11.5C16.7 11 17 10.3 17 9.5C17 8 16 6.5 14.5 5.8C14.8 5.5 15 5 15 4.5C15 3 13.5 2 12 2Z" />
+                            <path d="M6 16L7 22H17L18 16H6Z" opacity="0.6"/>
+                        </svg>
+                    </div>
+                    <h1 class="font-cursive text-3xl text-bakery-brown mb-1">Dulce Encanto</h1>
+                    <p class="text-bakery-brownLight text-xs font-semibold tracking-wide uppercase">Bienvenido de vuelta</p>
+                </div>
+
+                <!-- Formulario -->
+                <form id="login-form" class="space-y-5">
+                    
+                    <!-- Correo registrado o usuario de Django -->
+                    <div class="relative group">
+                        <input type="text" id="login-email" name="username" autocomplete="username" class="peer w-full px-5 py-4 border-2 border-gray-100 rounded-2xl text-bakery-brown font-medium bg-transparent outline-none transition-all duration-300 focus:border-bakery-pink focus:bg-white hover:border-pink-100" placeholder=" " required />
+                        <label for="login-email" class="absolute left-4 top-4 text-gray-400 bg-white px-1 pointer-events-none transition-all duration-300 ease-in-out peer-placeholder-shown:top-4 peer-placeholder-shown:text-base peer-focus:-top-3 peer-focus:text-sm peer-focus:text-bakery-pink peer-focus:font-bold peer-[:not(:placeholder-shown)]:-top-3 peer-[:not(:placeholder-shown)]:text-sm peer-[:not(:placeholder-shown)]:text-bakery-pink">
+                            Correo electrónico o usuario
+                        </label>
+                    </div>
+
+                    <!-- Campo Contraseña -->
+                    <div class="relative">
+                        <input type="password" id="login-password" name="password" autocomplete="current-password" class="peer w-full px-5 py-4 border-2 border-gray-100 rounded-2xl text-bakery-brown font-medium bg-transparent outline-none transition-all duration-300 focus:border-bakery-pink focus:bg-white hover:border-pink-100 pr-12" placeholder=" " required />
+                        <label for="login-password" class="absolute left-4 top-4 text-gray-400 bg-white px-1 pointer-events-none transition-all duration-300 ease-in-out peer-placeholder-shown:top-4 peer-placeholder-shown:text-base peer-focus:-top-3 peer-focus:text-sm peer-focus:text-bakery-pink peer-focus:font-bold peer-[:not(:placeholder-shown)]:-top-3 peer-[:not(:placeholder-shown)]:text-sm peer-[:not(:placeholder-shown)]:text-bakery-pink">
+                            Contraseña
+                        </label>
+                        <!-- Botón mostrar/ocultar contraseña -->
+                        <button type="button" onclick="togglePassword('login-password', 'login-eye-icon')" class="absolute right-4 top-4 text-gray-400 hover:text-bakery-pink transition-colors focus:outline-none">
+                            <svg id="login-eye-icon" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                            </svg>
+                        </button>
+                    </div>
+
+                    <div class="flex justify-end">
+                        <a href="#" id="forgot-password" class="text-sm text-bakery-brownLight hover:text-bakery-pink font-semibold transition-colors duration-200">
+                            ¿Olvidaste tu contraseña?
+                        </a>
+                    </div>
+
+                    <p id="login-message" role="status" aria-live="polite" class="hidden text-sm rounded-xl px-4 py-3"></p>
+                    <button id="login-submit" type="submit" class="w-full bg-bakery-pink hover:bg-bakery-pinkHover text-white font-bold py-4 rounded-2xl shadow-lg shadow-pink-200 transform transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-pink-300 active:scale-95 flex items-center justify-center gap-2">
+                        Iniciar sesión
+                    </button>
+                </form>
+
+                <!-- Ir a Registro -->
+                <div class="mt-6 text-center">
+                    <p class="text-gray-500 text-sm">
+                        ¿Aún no tienes una cuenta? 
+                        <a href="#" onclick="showRegister(event)" class="text-bakery-pink font-bold hover:text-bakery-pinkHover hover:underline underline-offset-4 transition-colors">
+                            Regístrate aquí
+                        </a>
+                    </p>
+                </div>
+            </div>
+
+            <!-- ===================== -->
+            <!-- FORMULARIO REGISTRO   -->
+            <!-- ===================== -->
+            <div class="w-1/2 p-8 sm:p-10 flex flex-col justify-center">
+                <!-- Icono y Título -->
+                <div class="text-center mb-6">
+                    <h2 class="font-cursive text-3xl text-bakery-brown mb-1">Únete a la familia</h2>
+                    <p class="text-bakery-brownLight text-xs font-semibold tracking-wide uppercase">Crea tu cuenta dulce</p>
+                </div>
+
+                <!-- Formulario -->
+                <form id="register-form" class="space-y-4">
+                    
+                    <!-- Campo Nombre -->
+                    <div class="relative group">
+                        <input type="text" id="register-name" name="first_name" autocomplete="given-name" maxlength="150" class="peer w-full px-5 py-3.5 border-2 border-gray-100 rounded-2xl text-bakery-brown font-medium bg-transparent outline-none transition-all duration-300 focus:border-bakery-pink focus:bg-white hover:border-pink-100" placeholder=" " required />
+                        <label for="register-name" class="absolute left-4 top-3.5 text-gray-400 bg-white px-1 pointer-events-none transition-all duration-300 ease-in-out peer-placeholder-shown:top-3.5 peer-placeholder-shown:text-base peer-focus:-top-3 peer-focus:text-sm peer-focus:text-bakery-pink peer-focus:font-bold peer-[:not(:placeholder-shown)]:-top-3 peer-[:not(:placeholder-shown)]:text-sm peer-[:not(:placeholder-shown)]:text-bakery-pink">
+                            Nombre(s)
+                        </label>
+                    </div>
+
+                    <!-- Apellidos -->
+                    <div class="relative group">
+                        <input type="text" id="register-lastname" name="last_name" autocomplete="family-name" maxlength="150" class="peer w-full px-5 py-3.5 border-2 border-gray-100 rounded-2xl text-bakery-brown font-medium bg-transparent outline-none transition-all duration-300 focus:border-bakery-pink focus:bg-white hover:border-pink-100" placeholder=" " required />
+                        <label for="register-lastname" class="absolute left-4 top-3.5 text-gray-400 bg-white px-1 pointer-events-none transition-all duration-300 ease-in-out peer-placeholder-shown:top-3.5 peer-placeholder-shown:text-base peer-focus:-top-3 peer-focus:text-sm peer-focus:text-bakery-pink peer-focus:font-bold peer-[:not(:placeholder-shown)]:-top-3 peer-[:not(:placeholder-shown)]:text-sm peer-[:not(:placeholder-shown)]:text-bakery-pink">
+                            Apellidos
+                        </label>
+                    </div>
+
+                    <!-- Nombre de usuario -->
+                    <div class="relative group">
+                        <input type="text" id="register-username" name="username" autocomplete="username" minlength="3" maxlength="150" pattern="[A-Za-z0-9@.+_-]+" title="Letras, números y los signos @ . + - _" class="peer w-full px-5 py-3.5 border-2 border-gray-100 rounded-2xl text-bakery-brown font-medium bg-transparent outline-none transition-all duration-300 focus:border-bakery-pink focus:bg-white hover:border-pink-100" placeholder=" " required />
+                        <label for="register-username" class="absolute left-4 top-3.5 text-gray-400 bg-white px-1 pointer-events-none transition-all duration-300 ease-in-out peer-placeholder-shown:top-3.5 peer-placeholder-shown:text-base peer-focus:-top-3 peer-focus:text-sm peer-focus:text-bakery-pink peer-focus:font-bold peer-[:not(:placeholder-shown)]:-top-3 peer-[:not(:placeholder-shown)]:text-sm peer-[:not(:placeholder-shown)]:text-bakery-pink">
+                            Nombre de usuario
+                        </label>
+                    </div>
+
+                    <!-- Campo Correo -->
+                    <div class="relative group">
+                        <input type="email" id="register-email" name="email" autocomplete="email" maxlength="254" class="peer w-full px-5 py-3.5 border-2 border-gray-100 rounded-2xl text-bakery-brown font-medium bg-transparent outline-none transition-all duration-300 focus:border-bakery-pink focus:bg-white hover:border-pink-100" placeholder=" " required />
+                        <label for="register-email" class="absolute left-4 top-3.5 text-gray-400 bg-white px-1 pointer-events-none transition-all duration-300 ease-in-out peer-placeholder-shown:top-3.5 peer-placeholder-shown:text-base peer-focus:-top-3 peer-focus:text-sm peer-focus:text-bakery-pink peer-focus:font-bold peer-[:not(:placeholder-shown)]:-top-3 peer-[:not(:placeholder-shown)]:text-sm peer-[:not(:placeholder-shown)]:text-bakery-pink">
+                            Correo electrónico
+                        </label>
+                    </div>
+
+                    <!-- Campo Contraseña -->
+                    <div class="relative">
+                        <input type="password" id="register-password" name="password" autocomplete="new-password" minlength="8" class="peer w-full px-5 py-3.5 border-2 border-gray-100 rounded-2xl text-bakery-brown font-medium bg-transparent outline-none transition-all duration-300 focus:border-bakery-pink focus:bg-white hover:border-pink-100 pr-12" placeholder=" " required />
+                        <label for="register-password" class="absolute left-4 top-3.5 text-gray-400 bg-white px-1 pointer-events-none transition-all duration-300 ease-in-out peer-placeholder-shown:top-3.5 peer-placeholder-shown:text-base peer-focus:-top-3 peer-focus:text-sm peer-focus:text-bakery-pink peer-focus:font-bold peer-[:not(:placeholder-shown)]:-top-3 peer-[:not(:placeholder-shown)]:text-sm peer-[:not(:placeholder-shown)]:text-bakery-pink">
+                            Contraseña
+                        </label>
+                        <!-- Botón mostrar/ocultar contraseña -->
+                        <button type="button" onclick="togglePassword('register-password', 'register-eye-icon')" class="absolute right-4 top-3.5 text-gray-400 hover:text-bakery-pink transition-colors focus:outline-none">
+                            <svg id="register-eye-icon" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                            </svg>
+                        </button>
+                    </div>
+
+                    <!-- Confirmación de contraseña -->
+                    <div class="relative group">
+                        <input type="password" id="register-password-confirm" name="password_confirm" autocomplete="new-password" minlength="8" class="peer w-full px-5 py-3.5 border-2 border-gray-100 rounded-2xl text-bakery-brown font-medium bg-transparent outline-none transition-all duration-300 focus:border-bakery-pink focus:bg-white hover:border-pink-100" placeholder=" " required />
+                        <label for="register-password-confirm" class="absolute left-4 top-3.5 text-gray-400 bg-white px-1 pointer-events-none transition-all duration-300 ease-in-out peer-placeholder-shown:top-3.5 peer-placeholder-shown:text-base peer-focus:-top-3 peer-focus:text-sm peer-focus:text-bakery-pink peer-focus:font-bold peer-[:not(:placeholder-shown)]:-top-3 peer-[:not(:placeholder-shown)]:text-sm peer-[:not(:placeholder-shown)]:text-bakery-pink">
+                            Confirmar contraseña
+                        </label>
+                    </div>
+                    <p class="text-xs text-bakery-brownLight">Al registrarte se creará una cuenta de cliente. Los accesos de empleados los gestiona el administrador.</p>
+                    <p id="register-message" role="status" aria-live="polite" class="hidden text-sm rounded-xl px-4 py-3"></p>
+
+                    <button id="register-submit" type="submit" class="w-full bg-bakery-brownLight hover:bg-bakery-brown text-white font-bold py-4 rounded-2xl shadow-lg shadow-amber-900/20 transform transition-all duration-300 hover:-translate-y-1 hover:shadow-xl active:scale-95 flex items-center justify-center mt-2">
+                        Crear cuenta
+                    </button>
+                </form>
+
+                <!-- Ir a Login -->
+                <div class="mt-6 text-center">
+                    <p class="text-gray-500 text-sm">
+                        ¿Ya tienes cuenta? 
+                        <a href="#" onclick="showLogin(event)" class="text-bakery-brownLight font-bold hover:text-bakery-brown hover:underline underline-offset-4 transition-colors">
+                            Inicia sesión aquí
+                        </a>
+                    </p>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Vista provisional posterior al login, antes del dashboard real de SIGEP -->
+    <section id="session-panel" class="hidden w-full max-w-lg bg-white rounded-[2rem] shadow-xl p-9 relative z-10 text-center" aria-live="polite">
+        <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-bakery-cream text-3xl mb-4">🧁</div>
+        <h2 class="font-cursive text-3xl text-bakery-brown mb-2">¡Bienvenido a Dulce Encanto!</h2>
+        <p id="session-name" class="text-bakery-brown font-bold text-lg mb-1"></p>
+        <p id="session-role" class="text-bakery-brownLight text-sm mb-5"></p>
+        <p class="text-gray-500 text-sm mb-6">La sesión con Django se ha iniciado correctamente. En la siguiente fase aquí estará el panel principal.</p>
+        <button id="logout-button" type="button" class="w-full bg-bakery-pink hover:bg-bakery-pinkHover text-white font-bold py-3 rounded-2xl transition-colors">Cerrar sesión</button>
+    </section>
+
+    <script>
+        // Función para cambiar a la vista de Registro
+        function showRegister(e) {
+            if (e) e.preventDefault();
+            const slider = document.getElementById('form-slider');
+            slider.classList.remove('translate-x-0');
+            slider.classList.add('-translate-x-1/2');
+        }
+
+        // Función para cambiar a la vista de Login
+        function showLogin(e) {
+            if (e) e.preventDefault();
+            const slider = document.getElementById('form-slider');
+            slider.classList.remove('-translate-x-1/2');
+            slider.classList.add('translate-x-0');
+        }
+
+        // Función reutilizable para mostrar/ocultar contraseña
+        function togglePassword(inputId, iconId) {
+            const passwordInput = document.getElementById(inputId);
+            const eyeIcon = document.getElementById(iconId);
+            
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                // Cambiar icono a ojo tachado
+                eyeIcon.innerHTML = `
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />
+                `;
+            } else {
+                passwordInput.type = 'password';
+                // Cambiar icono a ojo normal
+                eyeIcon.innerHTML = `
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                `;
+            }
+        }
+    </script>
+    <script src="{% static 'app.js' %}" defer></script>
+</body>
+</html>

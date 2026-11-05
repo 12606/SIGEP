@@ -1,0 +1,27 @@
+{
+  "folders": [
+    {
+      "name": "SIGEP · Backend Django",
+      "path": "backend"
+    },
+    {
+      "name": "SIGEP · Frontend web",
+      "path": "frontend"
+    }
+  ],
+  "settings": {
+    "files.encoding": "utf8",
+    "python.defaultInterpreterPath": "${workspaceFolder:SIGEP · Backend Django}/.venv/Scripts/python.exe",
+    "files.exclude": {
+      "**/__pycache__": true,
+      "**/.venv": true
+    }
+  },
+  "extensions": {
+    "recommendations": [
+      "ms-python.python",
+      "ms-python.vscode-pylance",
+      "ms-vscode.powershell"
+    ]
+  }
+}
