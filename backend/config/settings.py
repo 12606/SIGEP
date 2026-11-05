@@ -20,12 +20,14 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "rest_framework",
+    "corsheaders",
     "rest_framework_simplejwt.token_blacklist",
     "usuarios",
 ]
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    "corsheaders.middleware.CorsMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -89,3 +91,12 @@ USE_I18N = True
 USE_TZ = True
 STATIC_URL = "static/"
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+# Frontend local: python -m http.server 5500 / Live Server en VS Code.
+CORS_ALLOWED_ORIGINS = [
+    origen.strip() for origen in os.getenv(
+        "CORS_ALLOWED_ORIGINS",
+        "http://127.0.0.1:5500,http://localhost:5500",
+    ).split(",") if origen.strip()
+]
+CORS_URLS_REGEX = r"^/api/"

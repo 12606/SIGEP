@@ -139,3 +139,57 @@ class UsuariosAPITests(APITestCase):
         self.assertEqual(response.status_code, 200, response.data)
         self.assertIn("refresh", response.data)
         self.assertEqual(self.client.post(reverse("refresh"), {"refresh": tokens["refresh"]}, format="json").status_code, 401)
+
+
+class RegistroPublicoTests(APITestCase):
+    def setUp(self):
+        self.cliente = Rol.objects.create(codigo="CLIENTE", nombre="Cliente", activo=True)
+        Rol.objects.create(codigo="ADMIN", nombre="Administrador", activo=True)
+        self.payload = {
+            "username": "ana_cliente", "email": "ana@example.com",
+            "first_name": "Ana", "last_name": "Pérez",
+            "password": "Segura#Vainilla2026", "password_confirm": "Segura#Vainilla2026",
+        }
+
+    def test_registro_publico_crea_cliente_no_admin(self):
+        payload = {**self.payload, "rol_codigo": "ADMIN", "is_superuser": True, "is_staff": True}
+        response = self.client.post(reverse("public-register"), payload, format="json")
+        self.assertEqual(response.status_code, 201, response.data)
+        usuario = Usuario.objects.get(username="ana_cliente")
+        self.assertEqual(usuario.rol.codigo, "CLIENTE")
+        self.assertFalse(usuario.is_staff)
+        self.assertFalse(usuario.is_superuser)
+        self.assertTrue(usuario.check_password(self.payload["password"]))
+        self.assertNotIn("password", response.data["usuario"])
+
+    def test_login_con_email_y_usuario(self):
+        response = self.client.post(reverse("public-register"), self.payload, format="json")
+        self.assertEqual(response.status_code, 201, response.data)
+        for value in ["ana_cliente", "ana@example.com"]:
+            login = self.client.post(reverse("login"), {"username": value, "password": self.payload["password"]}, format="json")
+            self.assertEqual(login.status_code, 200, login.data)
+            self.assertIn("access", login.data)
+
+    def test_no_se_permite_correo_repetido(self):
+        self.client.post(reverse("public-register"), self.payload, format="json")
+        payload = {**self.payload, "username": "otro", "email": "ANA@EXAMPLE.COM"}
+        response = self.client.post(reverse("public-register"), payload, format="json")
+        self.assertEqual(response.status_code, 400)
+
+    def test_rechaza_confirmacion_incorrecta(self):
+        payload = {**self.payload, "password_confirm": "Distinta#2026"}
+        response = self.client.post(reverse("public-register"), payload, format="json")
+        self.assertEqual(response.status_code, 400)
+        self.assertFalse(Usuario.objects.filter(username="ana_cliente").exists())
+
+    def test_rechaza_contrasena_debil(self):
+        payload = {**self.payload, "password": "1234", "password_confirm": "1234"}
+        response = self.client.post(reverse("public-register"), payload, format="json")
+        self.assertEqual(response.status_code, 400)
+
+    def test_cliente_no_puede_administrar_usuarios(self):
+        self.client.post(reverse("public-register"), self.payload, format="json")
+        login = self.client.post(reverse("login"), {"username": "ana_cliente", "password": self.payload["password"]}, format="json")
+        self.client.credentials(HTTP_AUTHORIZATION=f"Bearer {login.data['access']}")
+        self.assertEqual(self.client.get(reverse("usuarios")).status_code, 403)
+        self.assertEqual(self.client.get(reverse("mi-perfil")).status_code, 200)

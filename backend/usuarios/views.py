@@ -6,10 +6,13 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.exceptions import TokenError
 from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+from rest_framework_simplejwt.views import TokenObtainPairView
+from rest_framework.throttling import AnonRateThrottle
 
 from .models import Rol, Usuario
 from .permissions import EsAdministradorSIGEP
-from .serializers import EstadoUsuarioSerializer, RolSerializer, UsuarioEscrituraSerializer, UsuarioSerializer
+from .serializers import EstadoUsuarioSerializer, RolSerializer, UsuarioEscrituraSerializer, UsuarioSerializer, RegistroPublicoSerializer
 
 
 @api_view(["GET"])
@@ -85,3 +88,44 @@ class LogoutView(APIView):
             raise serializers.ValidationError({"refresh": "Token inválido o ya revocado."})
         # JWT stateless: el access existente dura hasta su caducidad (15 minutos).
         return Response(status=status.HTTP_205_RESET_CONTENT)
+
+
+class LoginUsuarioOCorreoSerializer(TokenObtainPairSerializer):
+    """Conserva username+password y también admite email+password en username."""
+    def validate(self, attrs):
+        identificador = attrs.get(self.username_field, "")
+        if "@" in identificador:
+            username = Usuario.objects.filter(email__iexact=identificador).values_list("username", flat=True).first()
+            if username:
+                attrs[self.username_field] = username
+        return super().validate(attrs)
+
+
+class LoginView(TokenObtainPairView):
+    serializer_class = LoginUsuarioOCorreoSerializer
+    throttle_classes = [AnonRateThrottle]
+
+
+class RegistroRateThrottle(AnonRateThrottle):
+    rate = "10/hour"
+
+
+class RegistroPublicoView(generics.CreateAPIView):
+    """Alta pública de cuentas de clientes, no de empleados."""
+    serializer_class = RegistroPublicoSerializer
+    permission_classes = [permissions.AllowAny]
+    throttle_classes = [RegistroRateThrottle]
+
+    def create(self, request, *args, **kwargs):
+        if not Rol.objects.filter(codigo="CLIENTE", activo=True).exists():
+            return Response(
+                {"detail": "Registro no disponible: el administrador debe ejecutar python manage.py seed_roles."},
+                status=status.HTTP_503_SERVICE_UNAVAILABLE,
+            )
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        usuario = serializer.save()
+        return Response(
+            {"detail": "Cuenta creada correctamente.", "usuario": UsuarioSerializer(usuario).data},
+            status=status.HTTP_201_CREATED,
+        )
