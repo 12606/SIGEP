@@ -38,7 +38,7 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = "config.urls"
 TEMPLATES = [
-    {"BACKEND": "django.template.backends.django.DjangoTemplates", "DIRS": [], "APP_DIRS": True,
+    {"BACKEND": "django.template.backends.django.DjangoTemplates", "DIRS": [BASE_DIR.parent / "frontend"], "APP_DIRS": True,
      "OPTIONS": {"context_processors": [
          "django.template.context_processors.debug",
          "django.template.context_processors.request",
@@ -90,9 +90,12 @@ TIME_ZONE = "America/Mexico_City"
 USE_I18N = True
 USE_TZ = True
 STATIC_URL = "static/"
+# El frontend se sirve desde Django en la MISMA URL y puerto 8000.
+STATICFILES_DIRS = [BASE_DIR.parent / "frontend"]
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-# Frontend local: python -m http.server 5500 / Live Server en VS Code.
+# CORS opcional, solo para quien pruebe otro servidor frontend (p. ej. puerto 5500).
+# El uso recomendado es http://127.0.0.1:8000/ y no necesita CORS.
 CORS_ALLOWED_ORIGINS = [
     origen.strip() for origen in os.getenv(
         "CORS_ALLOWED_ORIGINS",
