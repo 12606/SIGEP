@@ -4,7 +4,9 @@
 (() => {
   "use strict";
 
-  const API_BASE = "http://127.0.0.1:8000/api";
+  // La web se abre desde Django en http://127.0.0.1:8000/.
+  // Usar ruta relativa evita errores CORS o puertos inconsistentes.
+  const API_BASE = "/api";
   const $ = (id) => document.getElementById(id);
   let sesion = null;
 
@@ -44,7 +46,7 @@
         cache: "no-store"
       });
     } catch (err) {
-      throw new Error("No se pudo conectar con Django. Revisa que la API esté encendida y CORS configurado.");
+      throw new Error("No se pudo conectar a SIGEP. Abre la web desde http://127.0.0.1:8000/ y verifica que Django esté encendido.");
     }
 
     let payload = null;

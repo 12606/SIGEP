@@ -1,22 +1,10 @@
-# SIGEP · Frontend web (Dulce Encanto)
+# Frontend de SIGEP
 
-Se conserva el diseño HTML/Tailwind que proporcionaste y se conecta con la API Django.
+Interfaz web de Dulce Encanto. `index.html` es una plantilla que Django sirve en `/` y `app.js` es un archivo estático servido en `/static/app.js`.
 
-## Ejecutar
-1. Inicia Django en otra terminal: `cd backend`, activa `.venv`, `python manage.py runserver`.
-2. En la carpeta `frontend`, ejecuta `py -m http.server 5500` (o `python -m http.server 5500`).
-3. Abre `http://127.0.0.1:5500` en el navegador.
-4. Asegúrate de tener Internet para Tailwind CDN y Google Fonts (solo en prototipo).
+**Para abrir:** inicia `python manage.py runserver` dentro de `backend` y entra a http://127.0.0.1:8000/ . No abras este HTML directamente por `file://` ni utilices Live Server para la integración recomendada.
 
-`app.js` define la dirección de la API (`http://127.0.0.1:8000/api`).
+- `index.html`: diseño Tailwind + formularios de login y registro.
+- `app.js`: peticiones relativas `/api/...` a Django (mismo origen).
 
-### Registro
-El registro envía `username`, `email`, `first_name`, `last_name`, `password` y `password_confirm` a `POST /api/auth/register/`. La API asigna **CLIENTE** automáticamente. Un empleado ADMIN se crea solamente a través de un administrador autenticado.
-
-### Login
-Permite correo o nombre de usuario y contraseña. Si el login funciona, muestra una pantalla simple de bienvenida con el rol. El dashboard es una etapa posterior.
-
-### Sesión
-Los tokens JWT permanecen en memoria. Al recargar el navegador se termina la sesión local. Logout revoca el refresh si el access sigue vigente. **Producción:** utilizar HTTPS y cookies HttpOnly seguras, autenticación basada en cookies con CSRF y medidas adicionales de protección.
-
-Nunca abras el HTML con doble clic (`file://`), porque la comunicación CORS está preparada para un servidor HTTP en el puerto 5500.
+Dependencia visual de CDN (Tailwind y Google Fonts): requiere Internet para verse con el estilo completo. Para producción, compilar CSS localmente.
