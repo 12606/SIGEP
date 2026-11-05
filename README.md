@@ -17,9 +17,6 @@ SIGEP/
   frontend/
     index.html                # Diseño Dulce Encanto (Django template)
     app.js                    # Login, registro, perfil, logout
-  docs/
-    01_INSTALACION_Y_PRUEBAS.md
-    02_GIT_RAMAS_SIN_CONFUSION.md
   SIGEP.code-workspace
   .gitignore
   README.md
