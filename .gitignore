@@ -1,0 +1,18 @@
+# Nunca subir credenciales ni entornos locales
+.env
+.env.*
+!.env.example
+**/.env
+**/.venv/
+**/venv/
+__pycache__/
+*.py[cod]
+*.sqlite3
+*.db
+*.log
+.pytest_cache/
+.coverage
+.DS_Store
+node_modules/
+.vs/
+.vscode/*.local.json

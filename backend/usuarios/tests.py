@@ -193,3 +193,11 @@ class RegistroPublicoTests(APITestCase):
         self.client.credentials(HTTP_AUTHORIZATION=f"Bearer {login.data['access']}")
         self.assertEqual(self.client.get(reverse("usuarios")).status_code, 403)
         self.assertEqual(self.client.get(reverse("mi-perfil")).status_code, 200)
+
+
+class FrontendIntegracionTests(APITestCase):
+    def test_inicio_muestra_frontend_y_script_estatico(self):
+        respuesta = self.client.get("/")
+        self.assertEqual(respuesta.status_code, 200)
+        self.assertContains(respuesta, "Dulce Encanto")
+        self.assertContains(respuesta, "/static/app.js")
