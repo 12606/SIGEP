@@ -1,0 +1,44 @@
+@base = http://127.0.0.1:8000
+@access = REEMPLAZA_POR_EL_ACCESS_DE_LOGIN
+@refresh = REEMPLAZA_POR_EL_REFRESH_MAS_RECIENTE
+
+### Salud de API y base de datos
+GET {{base}}/api/health/
+
+### Iniciar sesión
+POST {{base}}/api/auth/login/
+Content-Type: application/json
+
+{"username":"admin","password":"TU_CONTRASENA"}
+
+### Mi perfil
+GET {{base}}/api/usuarios/me/
+Authorization: Bearer {{access}}
+
+### Lista de roles (ADMIN)
+GET {{base}}/api/roles/
+Authorization: Bearer {{access}}
+
+### Crear usuario (ADMIN)
+POST {{base}}/api/usuarios/
+Content-Type: application/json
+Authorization: Bearer {{access}}
+
+{"username":"empleado01","email":"empleado01@example.com","first_name":"Ana","last_name":"Lopez","telefono":"3312345678","password":"ClaveEmpleado!2026","rol_codigo":"VENTAS"}
+
+### Lista de usuarios (ADMIN)
+GET {{base}}/api/usuarios/
+Authorization: Bearer {{access}}
+
+### Refrescar JWT: usa el NUEVO refresh que se devuelve
+POST {{base}}/api/auth/refresh/
+Content-Type: application/json
+
+{"refresh":"{{refresh}}"}
+
+### Cerrar sesión: invalida el refresh más reciente
+POST {{base}}/api/auth/logout/
+Content-Type: application/json
+Authorization: Bearer {{access}}
+
+{"refresh":"{{refresh}}"}
