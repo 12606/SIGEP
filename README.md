@@ -1,8 +1,6 @@
 # SIGEP — Pastelería Dulce Encanto · Proyecto web integrado
 
 
-**Cambio clave:** Django **también sirve el frontend** en `http://127.0.0.1:8000/`. Solo hay que iniciar un servidor; ya no debes ejecutar `python -m http.server 5500` para el uso habitual, y no se necesita CORS entre la página y la API porque comparten origen.
-
 ## Archivos
 
 ```text
