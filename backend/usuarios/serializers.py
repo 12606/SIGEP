@@ -82,3 +82,54 @@ class UsuarioEscrituraSerializer(serializers.ModelSerializer):
 
 class EstadoUsuarioSerializer(serializers.Serializer):
     activo = serializers.BooleanField()
+
+
+class RegistroPublicoSerializer(serializers.ModelSerializer):
+    """Registro para clientes: el rol NUNCA se acepta desde el navegador."""
+
+    password = serializers.CharField(write_only=True, trim_whitespace=False)
+    password_confirm = serializers.CharField(write_only=True, trim_whitespace=False)
+
+    class Meta:
+        model = Usuario
+        fields = (
+            "id", "username", "email", "first_name", "last_name",
+            "password", "password_confirm",
+        )
+        read_only_fields = ("id",)
+        extra_kwargs = {
+            "email": {"required": True},
+            "first_name": {"required": True, "allow_blank": False},
+            "last_name": {"required": True, "allow_blank": False},
+        }
+
+    def validate_email(self, value):
+        value = value.strip().lower()
+        if Usuario.objects.filter(email__iexact=value).exists():
+            raise serializers.ValidationError("Este correo ya está registrado.")
+        return value
+
+    def validate(self, attrs):
+        if attrs["password"] != attrs["password_confirm"]:
+            raise serializers.ValidationError({"password_confirm": "Las contraseñas no coinciden."})
+        ejemplo = Usuario(
+            username=attrs.get("username", ""),
+            email=attrs.get("email", ""),
+            first_name=attrs.get("first_name", ""),
+            last_name=attrs.get("last_name", ""),
+        )
+        try:
+            validate_password(attrs["password"], user=ejemplo)
+        except DjangoValidationError as exc:
+            raise serializers.ValidationError({"password": list(exc.messages)}) from exc
+        return attrs
+
+    def create(self, validated_data):
+        validated_data.pop("password_confirm")
+        password = validated_data.pop("password")
+        # El usuario de la web solo puede obtener CLIENTE.
+        rol_cliente = Rol.objects.get(codigo="CLIENTE", activo=True)
+        return Usuario.objects.create_user(
+            password=password, rol=rol_cliente,
+            is_staff=False, is_superuser=False, **validated_data,
+        )
