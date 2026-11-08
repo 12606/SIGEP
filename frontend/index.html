@@ -80,6 +80,8 @@
             transition: background-color 5000s ease-in-out 0s;
         }
     </style>
+    <!-- Estilos exclusivos del módulo de clientes (Fase 2) -->
+    <link rel="stylesheet" href="{% static 'clientes.css' %}">
 </head>
 <body class="bg-bakery-vanilla min-h-screen flex items-center justify-center p-4 selection:bg-bakery-pink selection:text-white relative overflow-x-hidden">
     
@@ -253,9 +255,85 @@
         <h2 class="font-cursive text-3xl text-bakery-brown mb-2">¡Bienvenido a Dulce Encanto!</h2>
         <p id="session-name" class="text-bakery-brown font-bold text-lg mb-1"></p>
         <p id="session-role" class="text-bakery-brownLight text-sm mb-5"></p>
-        <p class="text-gray-500 text-sm mb-6">La sesión con Django se ha iniciado correctamente. En la siguiente fase aquí estará el panel principal.</p>
+        <p class="text-gray-500 text-sm mb-6">La sesión con Django se ha iniciado correctamente. Los accesos a cada módulo dependen de tu rol.</p>
+        <div id="mi-ficha" class="hidden rounded-2xl bg-bakery-vanilla text-left p-5 mb-5">
+            <h3 class="font-bold text-bakery-brown mb-2">Mi ficha de cliente</h3>
+            <p id="mi-ficha-contenido" class="text-sm text-bakery-brownLight whitespace-pre-line"></p>
+        </div>
         <button id="logout-button" type="button" class="w-full bg-bakery-pink hover:bg-bakery-pinkHover text-white font-bold py-3 rounded-2xl transition-colors">Cerrar sesión</button>
     </section>
+
+
+    <!-- FASE 2: módulo de clientes visible únicamente para ADMIN y VENTAS -->
+    <section id="clientes-panel" class="hidden sigep-dashboard-shell relative z-10" aria-label="Gestión de clientes">
+      <div class="sigep-dashboard">
+        <header class="sigep-header">
+          <div class="sigep-brand"><span class="sigep-mark" aria-hidden="true">🧁</span>
+            <span><strong>Dulce Encanto</strong><small>SIGEP · Panel de gestión</small></span>
+          </div>
+          <div class="sigep-header-right"><span id="clientes-usuario" class="sigep-user"></span>
+            <button id="clientes-logout-button" class="sigep-button sigep-button-outline" type="button">Cerrar sesión</button>
+          </div>
+        </header>
+        <div class="sigep-content">
+          <div class="sigep-kicker">ADMINISTRACIÓN / CLIENTES</div>
+          <div class="sigep-intro">
+            <div><h1>Gestión de clientes</h1><p>Consulta la información de tus clientes y mantén sus datos actualizados.</p></div>
+            <button id="clientes-nuevo" type="button" class="sigep-button sigep-button-primary">+ Registrar cliente</button>
+          </div>
+          <div class="sigep-stats" aria-label="Resumen de resultados">
+            <div class="sigep-stat"><span>Clientes encontrados</span><strong id="clientes-total">0</strong><small>En el filtro actual</small></div>
+            <div class="sigep-stat"><span>Activos</span><strong id="clientes-activos">0</strong><small>En el filtro actual</small></div>
+            <div class="sigep-stat"><span>Inactivos</span><strong id="clientes-inactivos">0</strong><small>En el filtro actual</small></div>
+          </div>
+          <div class="sigep-list-card">
+            <div class="sigep-list-top">
+              <div><h2>Directorio de clientes</h2><p>Búsqueda y administración de fichas</p></div>
+              <button id="clientes-refrescar" type="button" class="sigep-button sigep-button-outline">Actualizar</button>
+            </div>
+            <div class="sigep-filters">
+              <label class="sigep-filter-search">Buscar cliente
+                <input id="clientes-buscar" type="search" placeholder="Nombre, apellido, teléfono o correo" autocomplete="off"/>
+              </label>
+              <label class="sigep-filter-status">Estado
+                <select id="clientes-estado-filtro"><option value="">Todos</option><option value="true">Activos</option><option value="false">Inactivos</option></select>
+              </label>
+            </div>
+            <div id="clientes-feedback" class="sigep-feedback" role="status" aria-live="polite" hidden></div>
+            <div class="sigep-table-scroll">
+              <table class="sigep-table">
+                <thead><tr><th>Cliente</th><th>Contacto</th><th>Dirección</th><th>Cuenta web</th><th>Estado</th><th>Acciones</th></tr></thead>
+                <tbody id="clientes-tbody"></tbody>
+              </table>
+            </div>
+            <div id="clientes-vacio" class="sigep-empty" hidden>No se encontraron clientes para este filtro.</div>
+            <div class="sigep-list-foot">Los registros desactivados permanecen guardados en MariaDB.</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Formulario de alta y edición, sin cambiar de página -->
+    <dialog id="cliente-dialog" class="sigep-dialog" aria-labelledby="cliente-dialog-title">
+      <form id="cliente-form" novalidate>
+        <div class="sigep-dialog-top"><div><span class="sigep-kicker">SIGEP · CLIENTES</span><h2 id="cliente-dialog-title">Registrar cliente</h2></div>
+          <button id="cliente-cerrar" type="button" class="sigep-close" aria-label="Cerrar formulario">×</button></div>
+        <p class="sigep-dialog-description">Los campos marcados con * son obligatorios.</p>
+        <div class="sigep-form-grid">
+          <label>Nombre *<input id="cliente-nombre" name="nombre" required maxlength="100" autocomplete="given-name"/></label>
+          <label>Apellidos *<input id="cliente-apellidos" name="apellidos" required maxlength="150" autocomplete="family-name"/></label>
+          <label>Teléfono<input id="cliente-telefono" name="telefono" maxlength="20" inputmode="tel" autocomplete="tel"/></label>
+          <label>Correo<input id="cliente-correo" name="correo" type="email" maxlength="254" autocomplete="email"/></label>
+          <label class="sigep-span2">Dirección<input id="cliente-direccion" name="direccion" maxlength="250" autocomplete="street-address"/></label>
+          <label class="sigep-span2">Observaciones<textarea id="cliente-observaciones" name="observaciones" rows="3" placeholder="Preferencias, indicaciones, notas de contacto..."></textarea></label>
+        </div>
+        <p id="cliente-form-error" class="sigep-form-error" role="alert" hidden></p>
+        <div class="sigep-dialog-actions">
+          <button id="cliente-cancelar" type="button" class="sigep-button sigep-button-outline">Cancelar</button>
+          <button id="cliente-guardar" type="submit" class="sigep-button sigep-button-primary">Guardar cliente</button>
+        </div>
+      </form>
+    </dialog>
 
     <script>
         // Función para cambiar a la vista de Registro
@@ -296,5 +374,6 @@
         }
     </script>
     <script src="{% static 'app.js' %}" defer></script>
+    <script src="{% static 'clientes.js' %}" defer></script>
 </body>
 </html>

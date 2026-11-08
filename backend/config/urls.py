@@ -12,5 +12,5 @@ urlpatterns = [
     path("api/auth/register/", RegistroPublicoView.as_view(), name="public-register"),
     path("api/auth/refresh/", TokenRefreshView.as_view(), name="refresh"),
     path("api/", include("usuarios.urls")),
-    path("api/clientes/", include("clientes.urls")),
+    path("api/", include("clientes.urls")),
 ]

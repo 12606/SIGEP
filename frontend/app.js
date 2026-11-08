@@ -9,6 +9,7 @@
   const API_BASE = "/api";
   const $ = (id) => document.getElementById(id);
   let sesion = null;
+  let renovacionPendiente = null;
 
   function aviso(id, texto, exito = false) {
     const elemento = $(id);
@@ -31,7 +32,8 @@
     boton.classList.toggle("cursor-not-allowed", bloqueado);
   }
 
-  async function peticion(ruta, metodo = "GET", datos = null, access = null) {
+  // Solicitudes de la API en el mismo origen; reintenta una vez tras renovar JWT.
+  async function peticion(ruta, metodo = "GET", datos = null, access = null, reintentar = true) {
     const headers = { "Accept": "application/json" };
     if (datos !== null) headers["Content-Type"] = "application/json";
     if (access) headers.Authorization = `Bearer ${access}`;
@@ -39,14 +41,17 @@
     let response;
     try {
       response = await fetch(`${API_BASE}${ruta}`, {
-        method: metodo,
-        headers,
+        method: metodo, headers,
         body: datos !== null ? JSON.stringify(datos) : undefined,
-        credentials: "omit",
-        cache: "no-store"
+        credentials: "omit", cache: "no-store"
       });
     } catch (err) {
-      throw new Error("No se pudo conectar a SIGEP. Abre la web desde http://127.0.0.1:8000/ y verifica que Django esté encendido.");
+      throw new Error("No se pudo conectar a SIGEP. Ejecuta Django y abre http://127.0.0.1:8000/.");
+    }
+
+    if (response.status === 401 && access && sesion?.refresh && reintentar) {
+      await renovarSesion();
+      return peticion(ruta, metodo, datos, sesion.access, false);
     }
 
     let payload = null;
@@ -54,7 +59,6 @@
     if (tipo.includes("application/json")) {
       try { payload = await response.json(); } catch { payload = null; }
     }
-
     if (!response.ok) {
       const partes = [];
       if (payload && typeof payload === "object") {
@@ -68,16 +72,63 @@
     return payload;
   }
 
+  async function renovarSesion() {
+    if (!sesion?.refresh) throw new Error("Inicia sesión nuevamente.");
+    if (!renovacionPendiente) {
+      renovacionPendiente = (async () => {
+        const refreshAnterior = sesion.refresh;
+        const nuevos = await peticion("/auth/refresh/", "POST", { refresh: refreshAnterior }, null, false);
+        if (!nuevos?.access) throw new Error("No fue posible renovar la sesión.");
+        // SIMPLE_JWT rota refresh tokens; conservar siempre el más reciente.
+        if (sesion) {
+          sesion.access = nuevos.access;
+          sesion.refresh = nuevos.refresh || refreshAnterior;
+        }
+      })().catch((error) => {
+        cerrarSesionLocal();
+        throw new Error(`Tu sesión expiró. Inicia sesión nuevamente. ${error.message}`);
+      }).finally(() => { renovacionPendiente = null; });
+    }
+    return renovacionPendiente;
+  }
+
+  function peticionAutenticada(ruta, metodo = "GET", datos = null) {
+    if (!sesion?.access) return Promise.reject(new Error("Inicia sesión para continuar."));
+    return peticion(ruta, metodo, datos, sesion.access);
+  }
+
   function mostrarSesion(usuario) {
     $("auth-card").classList.add("hidden");
-    $("session-panel").classList.remove("hidden");
+    $("session-panel").classList.add("hidden");
+    $("clientes-panel").classList.add("hidden");
+    $("mi-ficha").classList.add("hidden");
     const nombre = [usuario.first_name, usuario.last_name].filter(Boolean).join(" ");
     $("session-name").textContent = nombre || usuario.username;
     $("session-role").textContent = `Usuario: ${usuario.username} · Rol: ${usuario.rol?.nombre || "Sin rol"}`;
+
+    const rol = usuario.rol?.codigo;
+    if (rol === "ADMIN" || rol === "VENTAS") {
+      $("clientes-panel").classList.remove("hidden");
+      window.SIGEPClientes?.iniciar({ usuario, request: peticionAutenticada });
+      return;
+    }
+
+    $("session-panel").classList.remove("hidden");
+    if (rol === "CLIENTE") {
+      $("mi-ficha").classList.remove("hidden");
+      $("mi-ficha-contenido").textContent = "Consultando tu ficha...";
+      peticionAutenticada("/clientes/me/").then(ficha => {
+        $("mi-ficha-contenido").textContent =
+          `${ficha.nombre} ${ficha.apellidos}\nTeléfono: ${ficha.telefono || "Sin registrar"}\nCorreo: ${ficha.correo || "Sin registrar"}\nDirección: ${ficha.direccion || "Sin registrar"}`;
+      }).catch(error => { $("mi-ficha-contenido").textContent = error.message; });
+    }
   }
 
   function cerrarSesionLocal() {
     sesion = null;
+    window.SIGEPClientes?.detener();
+    $("clientes-panel").classList.add("hidden");
+    $("mi-ficha").classList.add("hidden");
     $("session-panel").classList.add("hidden");
     $("auth-card").classList.remove("hidden");
     $("login-password").value = "";
@@ -138,21 +189,22 @@
     }
   });
 
-  $("logout-button").addEventListener("click", async () => {
+  async function cerrarSesion(boton) {
     if (!sesion) return cerrarSesionLocal();
     const { access, refresh } = sesion;
-    $("logout-button").disabled = true;
+    boton.disabled = true;
     try {
       await peticion("/auth/logout/", "POST", { refresh }, access);
     } catch (error) {
-      // Aunque falle la revocación, borramos la sesión local.
-      // Si el access expiró, el refresh puede seguir válido en el servidor.
-      console.warn("No fue posible revocar el token de renovación:", error.message);
+      // Los tokens guardados solo en memoria se descartan incluso si la red falla.
+      console.warn("No fue posible revocar el refresh token:", error.message);
     } finally {
-      $("logout-button").disabled = false;
+      boton.disabled = false;
       cerrarSesionLocal();
     }
-  });
+  }
+  $("logout-button").addEventListener("click", () => cerrarSesion($("logout-button")));
+  $("clientes-logout-button").addEventListener("click", () => cerrarSesion($("clientes-logout-button")));
 
   $("forgot-password").addEventListener("click", (event) => {
     event.preventDefault();
