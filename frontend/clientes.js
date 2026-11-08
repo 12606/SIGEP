@@ -8,6 +8,7 @@
   let solicitudActual = 0;
   let temporizadorBusqueda = null;
   let editandoId = null;
+  let esAdmin = false;
 
   function mostrarAviso(texto, error = false) {
     const aviso = $("clientes-feedback");
@@ -59,7 +60,17 @@
       contacto.append(telefono, correo);
       tr.appendChild(contacto);
       celda(tr, cliente.direccion);
-      celda(tr, cliente.usuario != null ? "Vinculada" : "Mostrador");
+      const columnaCuenta = document.createElement("td");
+      if (cliente.cuenta) {
+        const usuario = document.createElement("div");
+        usuario.textContent = cliente.cuenta.username;
+        const rol = document.createElement("small");
+        rol.textContent = `Rol: ${cliente.cuenta.rol_nombre || cliente.cuenta.rol_codigo || "Sin rol"}`;
+        columnaCuenta.append(usuario, rol);
+      } else {
+        columnaCuenta.textContent = cliente.usuario != null ? "Vinculada" : "Mostrador";
+      }
+      tr.appendChild(columnaCuenta);
       const estado = document.createElement("td");
       const insignia = document.createElement("span");
       insignia.className = `sigep-status ${cliente.activo ? "sigep-status-on" : "sigep-status-off"}`;
@@ -71,6 +82,9 @@
       grupo.className = "sigep-row-actions";
       grupo.appendChild(accion("Editar", "sigep-action-edit", () => abrirEditar(cliente)));
       grupo.appendChild(accion(cliente.activo ? "Desactivar" : "Activar", "sigep-action-toggle", () => cambiarEstado(cliente)));
+      if (esAdmin && cliente.usuario != null) {
+        grupo.appendChild(accion("Cambiar rol", "sigep-action-edit", () => window.SIGEPUsuarios?.abrirEditarId(cliente.usuario)));
+      }
       botones.appendChild(grupo);
       tr.appendChild(botones);
       tbody.appendChild(tr);
@@ -175,6 +189,7 @@
     detener();
     request = fetchAutorizado;
     conectado = true;
+    esAdmin = usuario.rol?.codigo === "ADMIN" || usuario.is_superuser === true;
     $("clientes-buscar").value = "";
     $("clientes-estado-filtro").value = "";
     $("clientes-usuario").textContent = `${usuario.first_name || usuario.username} · ${usuario.rol?.nombre || "Personal"}`;
@@ -183,6 +198,7 @@
 
   function detener() {
     conectado = false;
+    esAdmin = false;
     solicitudActual++;
     request = null;
     lista = [];
@@ -201,5 +217,5 @@
     temporizadorBusqueda = setTimeout(cargar, 300);
   });
 
-  window.SIGEPClientes = { iniciar, detener };
+  window.SIGEPClientes = { iniciar, detener, actualizar: cargar };
 })();

@@ -119,7 +119,7 @@ class ClientesAPITests(APITestCase):
         self.client.force_authenticate(user=None)
         datos = {
             "username": "nuevo_clientew", "email": "nuevo@example.com",
-            "first_name": "Rosa", "last_name": "Mendoza",
+            "first_name": "Rosa", "last_name": "Mendoza", "telefono": "3312345678",
             "password": "ClaveFuerte!2026", "password_confirm": "ClaveFuerte!2026",
         }
         response = self.client.post(reverse("public-register"), datos, format="json")
@@ -132,7 +132,7 @@ class ClientesAPITests(APITestCase):
         self.client.force_authenticate(user=None)
         datos = {
             "username": "nueva_cliente", "email": "nueva@example.com",
-            "first_name": "Rosa", "last_name": "Mendoza",
+            "first_name": "Rosa", "last_name": "Mendoza", "telefono": "3312345678",
             "password": "ClaveFuerte!2026", "password_confirm": "ClaveFuerte!2026",
             "rol_codigo": "ADMIN", "is_superuser": True,
         }

@@ -13,7 +13,7 @@ class ClientesView(generics.ListCreateAPIView):
     """Lista y alta manual. Sin DELETE para conservar el historial comercial."""
     permission_classes = [EsAdministradorOVentas]
     serializer_class = ClienteSerializer
-    queryset = Cliente.objects.select_related("usuario").all()
+    queryset = Cliente.objects.select_related("usuario__rol").all()
 
     def get_queryset(self):
         queryset = super().get_queryset()
@@ -36,7 +36,7 @@ class ClientesView(generics.ListCreateAPIView):
 class ClienteDetalleView(generics.RetrieveUpdateAPIView):
     permission_classes = [EsAdministradorOVentas]
     serializer_class = ClienteSerializer
-    queryset = Cliente.objects.select_related("usuario").all()
+    queryset = Cliente.objects.select_related("usuario__rol").all()
     http_method_names = ("get", "patch", "head", "options")
 
 

@@ -107,9 +107,13 @@
     $("session-role").textContent = `Usuario: ${usuario.username} · Rol: ${usuario.rol?.nombre || "Sin rol"}`;
 
     const rol = usuario.rol?.codigo;
-    if (rol === "ADMIN" || rol === "VENTAS") {
+    const administrador = rol === "ADMIN" || usuario.is_superuser === true;
+    if (administrador || rol === "VENTAS") {
       $("clientes-panel").classList.remove("hidden");
+      $("sigep-admin-tabs").hidden = !administrador;
       window.SIGEPClientes?.iniciar({ usuario, request: peticionAutenticada });
+      if (administrador) window.SIGEPUsuarios?.iniciar({ usuario, request: peticionAutenticada });
+      cambiarVistaSIGEP("clientes");
       return;
     }
 
@@ -124,9 +128,24 @@
     }
   }
 
+  function cambiarVistaSIGEP(vista) {
+    $("sigep-vista-clientes").hidden = vista !== "clientes";
+    $("sigep-vista-usuarios").hidden = vista !== "usuarios";
+    for (const nombre of ["clientes", "usuarios"]) {
+      const boton = $(`sigep-tab-${nombre}`);
+      boton.classList.toggle("sigep-tab-active", vista === nombre);
+      boton.setAttribute("aria-selected", String(vista === nombre));
+    }
+    if (vista === "usuarios") window.SIGEPUsuarios?.actualizar();
+  }
+
+  $("sigep-tab-clientes").addEventListener("click", () => cambiarVistaSIGEP("clientes"));
+  $("sigep-tab-usuarios").addEventListener("click", () => cambiarVistaSIGEP("usuarios"));
+
   function cerrarSesionLocal() {
     sesion = null;
     window.SIGEPClientes?.detener();
+    window.SIGEPUsuarios?.detener();
     $("clientes-panel").classList.add("hidden");
     $("mi-ficha").classList.add("hidden");
     $("session-panel").classList.add("hidden");
@@ -171,6 +190,8 @@
       last_name: $("register-lastname").value.trim(),
       username: $("register-username").value.trim(),
       email: $("register-email").value.trim(),
+      telefono: $("register-phone").value.trim(),
+      direccion: $("register-address").value.trim(),
       password,
       password_confirm
     };

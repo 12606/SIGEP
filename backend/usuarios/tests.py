@@ -147,7 +147,7 @@ class RegistroPublicoTests(APITestCase):
         Rol.objects.create(codigo="ADMIN", nombre="Administrador", activo=True)
         self.payload = {
             "username": "ana_cliente", "email": "ana@example.com",
-            "first_name": "Ana", "last_name": "Pérez",
+            "first_name": "Ana", "last_name": "Pérez", "telefono": "3311112233",
             "password": "Segura#Vainilla2026", "password_confirm": "Segura#Vainilla2026",
         }
 
@@ -201,3 +201,87 @@ class FrontendIntegracionTests(APITestCase):
         self.assertEqual(respuesta.status_code, 200)
         self.assertContains(respuesta, "Dulce Encanto")
         self.assertContains(respuesta, "/static/app.js")
+
+class RegistroDatosYRolesTests(APITestCase):
+    """Garantiza consistencia con la fase 1 y protege la asignación de roles."""
+
+    def setUp(self):
+        self.rol_admin = Rol.objects.create(codigo="ADMIN", nombre="Administrador")
+        self.rol_cliente = Rol.objects.create(codigo="CLIENTE", nombre="Cliente")
+        self.rol_ventas = Rol.objects.create(codigo="VENTAS", nombre="Vendedor")
+        self.rol_repostero = Rol.objects.create(codigo="REPOSTERO", nombre="Repostero")
+        self.admin = Usuario.objects.create_superuser(
+            username="admin2", email="admin2@example.com", password="AdminSegura!2026", rol=self.rol_admin
+        )
+        self.cliente = Usuario.objects.create_user(
+            username="cliente99", email="cliente99@example.com", password="ClienteSegura!2026", rol=self.rol_cliente
+        )
+        self.vendedor = Usuario.objects.create_user(
+            username="ventas99", email="ventas99@example.com", password="VentasSegura!2026", rol=self.rol_ventas
+        )
+
+    def test_registro_publico_guarda_contacto_y_protege_rol(self):
+        from clientes.models import Cliente
+        r = self.client.post(reverse("public-register"), {
+            "username": "mariana", "email": "mariana@example.com",
+            "first_name": "Mariana", "last_name": "Lopez",
+            "telefono": "3312345678", "direccion": "Guadalajara, Jalisco",
+            "password": "ClaveValida!2026", "password_confirm": "ClaveValida!2026",
+            "rol_codigo": "ADMIN", "is_staff": True,
+        }, format="json")
+        self.assertEqual(r.status_code, 201, r.data)
+        u = Usuario.objects.get(username="mariana")
+        c = Cliente.objects.get(usuario=u)
+        self.assertEqual(u.rol.codigo, "CLIENTE")
+        self.assertFalse(u.is_staff)
+        self.assertEqual(u.telefono, "3312345678")
+        self.assertEqual(c.telefono, "3312345678")
+        self.assertEqual(c.direccion, "Guadalajara, Jalisco")
+
+    def test_registro_rechaza_telefono_invalido(self):
+        r = self.client.post(reverse("public-register"), {
+            "username": "badtelefono", "email": "bad@example.com",
+            "first_name": "Mariana", "last_name": "Lopez", "telefono": "123",
+            "password": "ClaveValida!2026", "password_confirm": "ClaveValida!2026",
+        }, format="json")
+        self.assertEqual(r.status_code, 400)
+        self.assertFalse(Usuario.objects.filter(username="badtelefono").exists())
+
+    def test_admin_cambia_rol_y_se_crea_ficha_si_pasa_a_cliente(self):
+        from clientes.models import Cliente
+        self.client.force_authenticate(user=self.admin)
+        url = reverse("usuario-detalle", args=[self.vendedor.id])
+        r = self.client.patch(url, {"rol_codigo": "CLIENTE"}, format="json")
+        self.assertEqual(r.status_code, 200, r.data)
+        self.vendedor.refresh_from_db()
+        self.assertEqual(self.vendedor.rol.codigo, "CLIENTE")
+        self.assertTrue(Cliente.objects.filter(usuario=self.vendedor).exists())
+
+    def test_admin_no_puede_cambiar_rol_de_superusuario(self):
+        self.client.force_authenticate(user=self.admin)
+        r = self.client.patch(reverse("usuario-detalle", args=[self.admin.id]), {"rol_codigo": "VENTAS"}, format="json")
+        self.assertEqual(r.status_code, 400, r.data)
+
+    def test_admin_no_puede_quitarse_propio_rol(self):
+        admin_normal = Usuario.objects.create_user(
+            username="jefe2", email="jefe2@example.com", password="ClaveJefe!2026", rol=self.rol_admin
+        )
+        self.client.force_authenticate(user=admin_normal)
+        r = self.client.patch(reverse("usuario-detalle", args=[admin_normal.id]), {"rol_codigo": "VENTAS"}, format="json")
+        self.assertEqual(r.status_code, 400, r.data)
+
+    def test_ventas_no_puede_cambiar_roles(self):
+        self.client.force_authenticate(user=self.vendedor)
+        r = self.client.patch(reverse("usuario-detalle", args=[self.cliente.id]), {"rol_codigo": "ADMIN"}, format="json")
+        self.assertEqual(r.status_code, 403)
+
+    def test_admin_crea_cuenta_cliente_y_ficha(self):
+        from clientes.models import Cliente
+        self.client.force_authenticate(user=self.admin)
+        r = self.client.post(reverse("usuarios"), {
+            "username": "nuevo_web", "email": "nuevo_web@example.com",
+            "first_name": "Pedro", "last_name": "Soto", "telefono": "3311118888",
+            "password": "ClaveSegura!2026", "rol_codigo": "CLIENTE",
+        }, format="json")
+        self.assertEqual(r.status_code, 201, r.data)
+        self.assertTrue(Cliente.objects.filter(usuario__username="nuevo_web").exists())

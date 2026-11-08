@@ -1,4 +1,6 @@
 from django.contrib.auth.password_validation import validate_password
+from django.db import transaction
+import re
 from django.core.exceptions import ValidationError as DjangoValidationError
 from rest_framework import serializers
 from .models import Rol, Usuario
@@ -17,7 +19,7 @@ class UsuarioSerializer(serializers.ModelSerializer):
         model = Usuario
         fields = (
             "id", "username", "email", "first_name", "last_name",
-            "telefono", "rol", "is_active", "date_joined", "last_login",
+            "telefono", "rol", "is_active", "is_superuser", "date_joined", "last_login",
         )
         read_only_fields = fields
 
@@ -51,6 +53,14 @@ class UsuarioEscrituraSerializer(serializers.ModelSerializer):
                 raise serializers.ValidationError({"password": "La contraseña es obligatoria."})
             if "rol" not in attrs:
                 raise serializers.ValidationError({"rol_codigo": "Debes seleccionar un rol."})
+        if self.instance is not None and "rol" in attrs:
+            nuevo_rol = attrs["rol"]
+            if nuevo_rol.pk != self.instance.rol_id:
+                request = self.context.get("request")
+                if self.instance.is_superuser:
+                    raise serializers.ValidationError({"rol_codigo": "El rol de un superusuario está protegido."})
+                if request and request.user.pk == self.instance.pk:
+                    raise serializers.ValidationError({"rol_codigo": "No puedes cambiar tu propio rol."})
         if "password" in attrs:
             # Django verifica longitud, contraseñas comunes y similitud con el usuario.
             user = Usuario(**{k: v for k, v in attrs.items() if k in ("username", "email", "first_name", "last_name")})
@@ -62,10 +72,22 @@ class UsuarioEscrituraSerializer(serializers.ModelSerializer):
                 raise serializers.ValidationError({"password": list(exc.messages)}) from exc
         return attrs
 
+    @transaction.atomic
     def create(self, validated_data):
         password = validated_data.pop("password")
-        return Usuario.objects.create_user(password=password, **validated_data)
+        usuario = Usuario.objects.create_user(password=password, **validated_data)
+        if usuario.rol and usuario.rol.codigo == "CLIENTE":
+            from clientes.models import Cliente
+            Cliente.objects.create(
+                usuario=usuario,
+                nombre=usuario.first_name or usuario.username,
+                apellidos=usuario.last_name or "Sin apellidos",
+                correo=usuario.email,
+                telefono=usuario.telefono,
+            )
+        return usuario
 
+    @transaction.atomic
     def update(self, instance, validated_data):
         password = validated_data.pop("password", None)
         for field, value in validated_data.items():
@@ -73,6 +95,19 @@ class UsuarioEscrituraSerializer(serializers.ModelSerializer):
         if password is not None:
             instance.set_password(password)
         instance.save()
+        # Si el administrador convierte una cuenta en CLIENTE, crear su ficha si no
+        # existe. No vincular automáticamente fichas manuales por correo.
+        if instance.rol and instance.rol.codigo == "CLIENTE":
+            from clientes.models import Cliente
+            Cliente.objects.get_or_create(
+                usuario=instance,
+                defaults={
+                    "nombre": instance.first_name or instance.username,
+                    "apellidos": instance.last_name or "Sin apellidos",
+                    "telefono": instance.telefono,
+                    "correo": instance.email,
+                },
+            )
         return instance
 
     def to_representation(self, instance):
@@ -89,19 +124,29 @@ class RegistroPublicoSerializer(serializers.ModelSerializer):
 
     password = serializers.CharField(write_only=True, trim_whitespace=False)
     password_confirm = serializers.CharField(write_only=True, trim_whitespace=False)
+    # No existe direccion en Usuario: se almacena exclusivamente en la ficha Cliente.
+    direccion = serializers.CharField(max_length=250, write_only=True, required=False, allow_blank=True)
 
     class Meta:
         model = Usuario
         fields = (
             "id", "username", "email", "first_name", "last_name",
-            "password", "password_confirm",
+            "telefono", "direccion", "password", "password_confirm",
         )
         read_only_fields = ("id",)
         extra_kwargs = {
             "email": {"required": True},
             "first_name": {"required": True, "allow_blank": False},
             "last_name": {"required": True, "allow_blank": False},
+            "telefono": {"required": True, "allow_blank": False},
         }
+
+    def validate_telefono(self, value):
+        telefono = value.strip()
+        digitos = re.sub(r"\D", "", telefono)
+        if not (10 <= len(digitos) <= 15):
+            raise serializers.ValidationError("Ingresa un teléfono válido de 10 a 15 dígitos.")
+        return telefono
 
     def validate_email(self, value):
         value = value.strip().lower()
@@ -125,11 +170,24 @@ class RegistroPublicoSerializer(serializers.ModelSerializer):
         return attrs
 
     def create(self, validated_data):
+        from clientes.models import Cliente
+
         validated_data.pop("password_confirm")
         password = validated_data.pop("password")
-        # El usuario de la web solo puede obtener CLIENTE.
+        direccion = validated_data.pop("direccion", "").strip()
         rol_cliente = Rol.objects.get(codigo="CLIENTE", activo=True)
-        return Usuario.objects.create_user(
-            password=password, rol=rol_cliente,
-            is_staff=False, is_superuser=False, **validated_data,
-        )
+        # Ambas operaciones son una transacción: no se crea un usuario sin ficha.
+        with transaction.atomic():
+            usuario = Usuario.objects.create_user(
+                password=password, rol=rol_cliente,
+                is_staff=False, is_superuser=False, **validated_data,
+            )
+            Cliente.objects.create(
+                usuario=usuario,
+                nombre=usuario.first_name,
+                apellidos=usuario.last_name,
+                correo=usuario.email,
+                telefono=usuario.telefono,
+                direccion=direccion,
+            )
+        return usuario

@@ -205,6 +205,24 @@
                         </label>
                     </div>
 
+                    <!-- Datos de contacto definidos para la tabla Cliente -->
+                    <div class="relative group">
+                        <input type="tel" id="register-phone" name="telefono" autocomplete="tel" maxlength="20" inputmode="tel"
+                               class="peer w-full px-5 py-3.5 border-2 border-gray-100 rounded-2xl text-bakery-brown font-medium bg-transparent outline-none transition-all duration-300 focus:border-bakery-pink focus:bg-white hover:border-pink-100"
+                               placeholder=" " required />
+                        <label for="register-phone" class="absolute left-4 top-3.5 text-gray-400 bg-white px-1 pointer-events-none transition-all duration-300 ease-in-out peer-placeholder-shown:top-3.5 peer-placeholder-shown:text-base peer-focus:-top-3 peer-focus:text-sm peer-focus:text-bakery-pink peer-focus:font-bold peer-[:not(:placeholder-shown)]:-top-3 peer-[:not(:placeholder-shown)]:text-sm peer-[:not(:placeholder-shown)]:text-bakery-pink">
+                            Teléfono de contacto
+                        </label>
+                    </div>
+                    <div class="relative group">
+                        <input type="text" id="register-address" name="direccion" autocomplete="street-address" maxlength="250"
+                               class="peer w-full px-5 py-3.5 border-2 border-gray-100 rounded-2xl text-bakery-brown font-medium bg-transparent outline-none transition-all duration-300 focus:border-bakery-pink focus:bg-white hover:border-pink-100"
+                               placeholder=" " />
+                        <label for="register-address" class="absolute left-4 top-3.5 text-gray-400 bg-white px-1 pointer-events-none transition-all duration-300 ease-in-out peer-placeholder-shown:top-3.5 peer-placeholder-shown:text-base peer-focus:-top-3 peer-focus:text-sm peer-focus:text-bakery-pink peer-focus:font-bold peer-[:not(:placeholder-shown)]:-top-3 peer-[:not(:placeholder-shown)]:text-sm peer-[:not(:placeholder-shown)]:text-bakery-pink">
+                            Dirección (opcional)
+                        </label>
+                    </div>
+
                     <!-- Campo Contraseña -->
                     <div class="relative">
                         <input type="password" id="register-password" name="password" autocomplete="new-password" minlength="8" class="peer w-full px-5 py-3.5 border-2 border-gray-100 rounded-2xl text-bakery-brown font-medium bg-transparent outline-none transition-all duration-300 focus:border-bakery-pink focus:bg-white hover:border-pink-100 pr-12" placeholder=" " required />
@@ -276,6 +294,11 @@
           </div>
         </header>
         <div class="sigep-content">
+          <nav id="sigep-admin-tabs" class="sigep-tabs" aria-label="Secciones de administración" hidden>
+            <button id="sigep-tab-clientes" type="button" class="sigep-tab sigep-tab-active" aria-selected="true">Clientes</button>
+            <button id="sigep-tab-usuarios" type="button" class="sigep-tab" aria-selected="false">Usuarios y roles</button>
+          </nav>
+          <div id="sigep-vista-clientes">
           <div class="sigep-kicker">ADMINISTRACIÓN / CLIENTES</div>
           <div class="sigep-intro">
             <div><h1>Gestión de clientes</h1><p>Consulta la información de tus clientes y mantén sus datos actualizados.</p></div>
@@ -309,9 +332,66 @@
             <div id="clientes-vacio" class="sigep-empty" hidden>No se encontraron clientes para este filtro.</div>
             <div class="sigep-list-foot">Los registros desactivados permanecen guardados en MariaDB.</div>
           </div>
+          </div><!-- /sigep-vista-clientes -->
+
+          <!-- Administracion de CUENTAS (solo ADMIN). Se diferencia de las fichas comerciales. -->
+          <div id="sigep-vista-usuarios" hidden>
+            <div class="sigep-kicker">ADMINISTRACIÓN / ACCESOS</div>
+            <div class="sigep-intro">
+              <div>
+                <h1>Usuarios y roles</h1>
+                <p>Administra el tipo de cuenta y los permisos de acceso al sistema.</p>
+              </div>
+            </div>
+            <div class="sigep-list-card">
+              <div class="sigep-list-top">
+                <div><h2>Cuentas registradas</h2><p>ADMIN · VENTAS · REPOSTERO · ALMACEN · CLIENTE</p></div>
+                <button id="usuarios-refrescar" type="button" class="sigep-button sigep-button-outline">Actualizar</button>
+              </div>
+              <div class="sigep-filters">
+                <label class="sigep-filter-search">Buscar cuenta
+                  <input id="usuarios-buscar" type="search" placeholder="Usuario, correo o nombre" autocomplete="off" />
+                </label>
+                <label class="sigep-filter-status">Estado de cuenta
+                  <select id="usuarios-filtro"><option value="">Todas</option><option value="true">Activas</option><option value="false">Inactivas</option></select>
+                </label>
+              </div>
+              <div id="usuarios-feedback" class="sigep-feedback" role="status" aria-live="polite" hidden></div>
+              <div class="sigep-table-scroll">
+                <table class="sigep-table">
+                  <thead><tr><th>Usuario</th><th>Correo</th><th>Rol asignado</th><th>Estado</th><th>Acciones</th></tr></thead>
+                  <tbody id="usuarios-tbody"></tbody>
+                </table>
+              </div>
+              <div id="usuarios-vacio" class="sigep-empty" hidden>No se encontraron cuentas.</div>
+              <div class="sigep-list-foot">La cuenta de un superusuario y tu propio rol están protegidos contra cambios accidentales.</div>
+            </div>
+          </div>
         </div>
       </div>
     </section>
+
+    <!-- Solo ADMIN: cambiar el rol de una cuenta existente. -->
+    <dialog id="usuario-rol-dialog" class="sigep-dialog" aria-labelledby="usuario-rol-title">
+      <form id="usuario-rol-form">
+        <div class="sigep-dialog-top">
+          <div><span class="sigep-kicker">SIGEP · CONTROL DE ACCESO</span><h2 id="usuario-rol-title">Cambiar rol de usuario</h2></div>
+          <button id="usuario-rol-cerrar" type="button" class="sigep-close" aria-label="Cerrar">×</button>
+        </div>
+        <p id="usuario-rol-resumen" class="sigep-dialog-description"></p>
+        <div class="sigep-form-grid">
+          <label class="sigep-span2">Nuevo rol
+            <select id="usuario-rol-select" required></select>
+          </label>
+        </div>
+        <p class="sigep-dialog-description">Modificar el rol cambia las funciones que puede utilizar esa cuenta. El usuario deberá iniciar sesión nuevamente para actualizar la vista del panel.</p>
+        <p id="usuario-rol-error" class="sigep-form-error" role="alert" hidden></p>
+        <div class="sigep-dialog-actions">
+          <button id="usuario-rol-cancelar" type="button" class="sigep-button sigep-button-outline">Cancelar</button>
+          <button id="usuario-rol-guardar" type="submit" class="sigep-button sigep-button-primary">Guardar rol</button>
+        </div>
+      </form>
+    </dialog>
 
     <!-- Formulario de alta y edición, sin cambiar de página -->
     <dialog id="cliente-dialog" class="sigep-dialog" aria-labelledby="cliente-dialog-title">
@@ -375,5 +455,6 @@
     </script>
     <script src="{% static 'app.js' %}" defer></script>
     <script src="{% static 'clientes.js' %}" defer></script>
+    <script src="{% static 'usuarios.js' %}" defer></script>
 </body>
 </html>
