@@ -1,3 +1,5 @@
+from django.conf import settings
+from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import include, path
 from django.views.generic import TemplateView
@@ -13,4 +15,9 @@ urlpatterns = [
     path("api/auth/refresh/", TokenRefreshView.as_view(), name="refresh"),
     path("api/", include("usuarios.urls")),
     path("api/", include("clientes.urls")),
+    path("api/", include("productos.urls")),
 ]
+
+# Solo en desarrollo. En producción usar almacenamiento/servidor de medios dedicado.
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

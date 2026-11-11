@@ -24,6 +24,7 @@ INSTALLED_APPS = [
     "rest_framework_simplejwt.token_blacklist",
     "usuarios",
     "clientes",
+    "productos.apps.ProductosConfig",
 ]
 
 MIDDLEWARE = [
@@ -91,6 +92,9 @@ TIME_ZONE = "America/Mexico_City"
 USE_I18N = True
 USE_TZ = True
 STATIC_URL = "static/"
+# Fotos cargadas: los archivos físicos no se almacenan dentro de MariaDB.
+MEDIA_URL = "/media/"
+MEDIA_ROOT = BASE_DIR / "media"
 # El frontend se sirve desde Django en la MISMA URL y puerto 8000.
 STATICFILES_DIRS = [BASE_DIR.parent / "frontend"]
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"

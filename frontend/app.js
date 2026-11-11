@@ -35,14 +35,15 @@
   // Solicitudes de la API en el mismo origen; reintenta una vez tras renovar JWT.
   async function peticion(ruta, metodo = "GET", datos = null, access = null, reintentar = true) {
     const headers = { "Accept": "application/json" };
-    if (datos !== null) headers["Content-Type"] = "application/json";
+    const esFormulario = typeof FormData !== "undefined" && datos instanceof FormData;
+    if (datos !== null && !esFormulario) headers["Content-Type"] = "application/json";
     if (access) headers.Authorization = `Bearer ${access}`;
 
     let response;
     try {
       response = await fetch(`${API_BASE}${ruta}`, {
         method: metodo, headers,
-        body: datos !== null ? JSON.stringify(datos) : undefined,
+        body: datos !== null ? (esFormulario ? datos : JSON.stringify(datos)) : undefined,
         credentials: "omit", cache: "no-store"
       });
     } catch (err) {
@@ -110,8 +111,11 @@
     const administrador = rol === "ADMIN" || usuario.is_superuser === true;
     if (administrador || rol === "VENTAS") {
       $("clientes-panel").classList.remove("hidden");
-      $("sigep-admin-tabs").hidden = !administrador;
+      // El catálogo es visible para ADMIN y VENTAS; cuentas y roles solo para ADMIN.
+      $("sigep-admin-tabs").hidden = false;
+      $("sigep-tab-usuarios").hidden = !administrador;
       window.SIGEPClientes?.iniciar({ usuario, request: peticionAutenticada });
+      window.SIGEPProductos?.iniciar({ usuario, request: peticionAutenticada });
       if (administrador) window.SIGEPUsuarios?.iniciar({ usuario, request: peticionAutenticada });
       cambiarVistaSIGEP("clientes");
       return;
@@ -131,21 +135,25 @@
   function cambiarVistaSIGEP(vista) {
     $("sigep-vista-clientes").hidden = vista !== "clientes";
     $("sigep-vista-usuarios").hidden = vista !== "usuarios";
-    for (const nombre of ["clientes", "usuarios"]) {
+    $("sigep-vista-productos").hidden = vista !== "productos";
+    for (const nombre of ["clientes", "usuarios", "productos"]) {
       const boton = $(`sigep-tab-${nombre}`);
       boton.classList.toggle("sigep-tab-active", vista === nombre);
       boton.setAttribute("aria-selected", String(vista === nombre));
     }
     if (vista === "usuarios") window.SIGEPUsuarios?.actualizar();
+    if (vista === "productos") window.SIGEPProductos?.actualizar();
   }
 
   $("sigep-tab-clientes").addEventListener("click", () => cambiarVistaSIGEP("clientes"));
   $("sigep-tab-usuarios").addEventListener("click", () => cambiarVistaSIGEP("usuarios"));
+  $("sigep-tab-productos").addEventListener("click", () => cambiarVistaSIGEP("productos"));
 
   function cerrarSesionLocal() {
     sesion = null;
     window.SIGEPClientes?.detener();
     window.SIGEPUsuarios?.detener();
+    window.SIGEPProductos?.detener();
     $("clientes-panel").classList.add("hidden");
     $("mi-ficha").classList.add("hidden");
     $("session-panel").classList.add("hidden");

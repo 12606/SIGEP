@@ -82,6 +82,7 @@
     </style>
     <!-- Estilos exclusivos del módulo de clientes (Fase 2) -->
     <link rel="stylesheet" href="{% static 'clientes.css' %}">
+    <link rel="stylesheet" href="{% static 'productos.css' %}">
 </head>
 <body class="bg-bakery-vanilla min-h-screen flex items-center justify-center p-4 selection:bg-bakery-pink selection:text-white relative overflow-x-hidden">
     
@@ -297,6 +298,7 @@
           <nav id="sigep-admin-tabs" class="sigep-tabs" aria-label="Secciones de administración" hidden>
             <button id="sigep-tab-clientes" type="button" class="sigep-tab sigep-tab-active" aria-selected="true">Clientes</button>
             <button id="sigep-tab-usuarios" type="button" class="sigep-tab" aria-selected="false">Usuarios y roles</button>
+            <button id="sigep-tab-productos" type="button" class="sigep-tab" aria-selected="false">Productos</button>
           </nav>
           <div id="sigep-vista-clientes">
           <div class="sigep-kicker">ADMINISTRACIÓN / CLIENTES</div>
@@ -367,6 +369,53 @@
               <div class="sigep-list-foot">La cuenta de un superusuario y tu propio rol están protegidos contra cambios accidentales.</div>
             </div>
           </div>
+
+          <!-- FASE 3: catálogo de categorías y productos. Escritura solo ADMIN. -->
+          <div id="sigep-vista-productos" hidden>
+            <div class="sigep-kicker">ADMINISTRACIÓN / CATÁLOGO</div>
+            <div class="sigep-intro">
+              <div><h1>Productos y categorías</h1><p>Gestiona el catálogo de pasteles, postres, precios e imágenes.</p></div>
+              <button id="productos-nuevo" type="button" class="sigep-button sigep-button-primary">+ Nuevo producto</button>
+            </div>
+            <div class="sigep-stats" aria-label="Resumen del catálogo">
+              <div class="sigep-stat"><span>Productos encontrados</span><strong id="productos-total">0</strong><small>En el filtro actual</small></div>
+              <div class="sigep-stat"><span>Activos</span><strong id="productos-activos">0</strong><small>En el filtro actual</small></div>
+              <div class="sigep-stat"><span>Categorías</span><strong id="productos-categorias-total">0</strong><small>Registradas</small></div>
+            </div>
+            <div class="sigep-list-card">
+              <div class="sigep-list-top"><div><h2>Catálogo de productos</h2><p>Listado y administración de precios</p></div>
+                <button id="productos-refrescar" class="sigep-button sigep-button-outline" type="button">Actualizar</button>
+              </div>
+              <div class="sigep-filtros-productos">
+                <label>Buscar producto<input id="productos-buscar" type="search" placeholder="Nombre, categoría o descripción"></label>
+                <label>Categoría<select id="productos-filtro-categoria"><option value="">Todas</option></select></label>
+                <label>Estado<select id="productos-filtro-estado"><option value="">Todos</option><option value="true">Activos</option><option value="false">Inactivos</option></select></label>
+              </div>
+              <p id="productos-feedback" class="sigep-feedback" role="status" aria-live="polite" hidden></p>
+              <div class="sigep-table-scroll">
+                <table class="sigep-table">
+                  <thead><tr><th>Producto</th><th>Categoría</th><th>Precio</th><th>Unidad</th><th>Estado</th><th>Acciones</th></tr></thead>
+                  <tbody id="productos-tbody"></tbody>
+                </table>
+              </div>
+              <p id="productos-vacio" class="sigep-empty" hidden>No hay productos para este filtro.</p>
+              <div class="sigep-list-foot">Desactivar un producto lo oculta del catálogo de los demás roles; no se elimina de MariaDB.</div>
+            </div>
+
+            <div class="sigep-list-card sigep-categorias-bloque">
+              <div class="sigep-list-top"><div><h2>Categorías del catálogo</h2><p>Pasteles, cupcakes, galletas y otras familias</p></div>
+                <button id="categorias-nueva" type="button" class="sigep-button sigep-button-primary">+ Nueva categoría</button>
+              </div>
+              <p id="categorias-feedback" class="sigep-feedback" role="status" aria-live="polite" hidden></p>
+              <div class="sigep-table-scroll">
+                <table class="sigep-table">
+                  <thead><tr><th>Categoría</th><th>Descripción</th><th>Estado</th><th>Acciones</th></tr></thead>
+                  <tbody id="categorias-tbody"></tbody>
+                </table>
+              </div>
+              <p id="categorias-vacio" class="sigep-empty" hidden>No hay categorías registradas.</p>
+            </div>
+          </div><!-- /sigep-vista-productos -->
         </div>
       </div>
     </section>
@@ -415,6 +464,53 @@
       </form>
     </dialog>
 
+
+    <!-- Alta / edición de producto: campos alineados con la tabla productos. -->
+    <dialog id="producto-dialog" class="sigep-dialog" aria-labelledby="producto-dialog-title">
+      <form id="producto-form">
+        <div class="sigep-dialog-top"><div><span class="sigep-kicker">SIGEP · CATÁLOGO</span><h2 id="producto-dialog-title">Nuevo producto</h2></div>
+          <button id="producto-cerrar" type="button" class="sigep-close" aria-label="Cerrar">×</button></div>
+        <p class="sigep-dialog-description">Los campos marcados con * son obligatorios.</p>
+        <div class="sigep-form-grid">
+          <label>Nombre *<input id="producto-nombre" required maxlength="120" autocomplete="off"></label>
+          <label>Categoría *<select id="producto-categoria" required></select></label>
+          <label>Precio base (MXN) *<input id="producto-precio" type="number" step="0.01" min="0.01" required></label>
+          <label>Unidad de venta *<select id="producto-unidad" required>
+            <option value="PIEZA">Pieza</option><option value="CAJA">Caja</option>
+            <option value="PORCION">Porción</option><option value="KG">Kilogramo</option>
+          </select></label>
+          <div class="sigep-span2 sigep-imagen-campo">
+            <label for="producto-imagen-archivo">Imagen del producto (opcional)</label>
+            <input id="producto-imagen-archivo" type="file" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp">
+            <small>JPG, PNG o WebP · máximo 3 MB · entre 100 y 4096 píxeles por lado.</small>
+            <div class="sigep-imagen-preview-fila">
+              <img id="producto-imagen-preview" alt="Vista previa de imagen del producto" hidden>
+              <span id="producto-imagen-nota" aria-live="polite">Sin imagen seleccionada.</span>
+            </div>
+          </div>
+          <label class="sigep-span2">Descripción<textarea id="producto-descripcion" rows="3"></textarea></label>
+        </div>
+        <p id="producto-error" class="sigep-form-error" role="alert" hidden></p>
+        <div class="sigep-dialog-actions"><button id="producto-cancelar" type="button" class="sigep-button sigep-button-outline">Cancelar</button>
+          <button id="producto-guardar" type="submit" class="sigep-button sigep-button-primary">Guardar producto</button></div>
+      </form>
+    </dialog>
+
+    <!-- Alta / edición de categoría. -->
+    <dialog id="categoria-dialog" class="sigep-dialog" aria-labelledby="categoria-dialog-title">
+      <form id="categoria-form">
+        <div class="sigep-dialog-top"><div><span class="sigep-kicker">SIGEP · CATÁLOGO</span><h2 id="categoria-dialog-title">Nueva categoría</h2></div>
+          <button id="categoria-cerrar" type="button" class="sigep-close" aria-label="Cerrar">×</button></div>
+        <div class="sigep-form-grid">
+          <label class="sigep-span2">Nombre *<input id="categoria-nombre" required maxlength="90"></label>
+          <label class="sigep-span2">Descripción<textarea id="categoria-descripcion" maxlength="250" rows="3"></textarea></label>
+        </div>
+        <p id="categoria-error" class="sigep-form-error" role="alert" hidden></p>
+        <div class="sigep-dialog-actions"><button id="categoria-cancelar" type="button" class="sigep-button sigep-button-outline">Cancelar</button>
+          <button id="categoria-guardar" type="submit" class="sigep-button sigep-button-primary">Guardar categoría</button></div>
+      </form>
+    </dialog>
+
     <script>
         // Función para cambiar a la vista de Registro
         function showRegister(e) {
@@ -456,5 +552,6 @@
     <script src="{% static 'app.js' %}" defer></script>
     <script src="{% static 'clientes.js' %}" defer></script>
     <script src="{% static 'usuarios.js' %}" defer></script>
+    <script src="{% static 'productos.js' %}" defer></script>
 </body>
 </html>
