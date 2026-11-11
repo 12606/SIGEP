@@ -16,3 +16,6 @@ __pycache__/
 node_modules/
 .vs/
 .vscode/*.local.json
+
+# Fotografías que suben los usuarios (locales, no versionar)
+backend/media/
