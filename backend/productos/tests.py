@@ -106,7 +106,7 @@ class CatalogoAPITests(APITestCase):
     def test_cliente_solo_consulta_activos(self):
         self.auth(self.cliente)
         self.assertEqual(len(self.client.get(reverse("productos")).data), 1)
-        self.assertEqual(self.client.get(reverse("producto-detalle"), args=(self.producto_inactivo.pk,)).status_code, 404)
+        self.assertEqual(self.client.get(reverse("producto-detalle", args=[self.producto_inactivo.pk])).status_code,404)
 
     def test_ventas_no_modifica_producto(self):
         self.auth(self.vendedor)

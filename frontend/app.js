@@ -10,6 +10,7 @@
   const $ = (id) => document.getElementById(id);
   let sesion = null;
   let renovacionPendiente = null;
+  let origenCatalogo = null;
 
   function aviso(id, texto, exito = false) {
     const elemento = $(id);
@@ -102,6 +103,10 @@
     $("auth-card").classList.add("hidden");
     $("session-panel").classList.add("hidden");
     $("clientes-panel").classList.add("hidden");
+    $("catalogo-visitante-panel").classList.add("hidden");
+    $("session-panel").classList.remove("catalogo-sesion-activa");
+    $("catalogo-en-sesion").classList.add("hidden");
+    $("catalogo-abrir-sesion").classList.add("hidden");
     $("mi-ficha").classList.add("hidden");
     const nombre = [usuario.first_name, usuario.last_name].filter(Boolean).join(" ");
     $("session-name").textContent = nombre || usuario.username;
@@ -123,12 +128,17 @@
 
     $("session-panel").classList.remove("hidden");
     if (rol === "CLIENTE") {
+      $("session-panel").classList.add("catalogo-sesion-activa");
+      $("catalogo-en-sesion").classList.remove("hidden");
+      window.SIGEPCatalogo?.mostrar("catalogo-en-sesion");
       $("mi-ficha").classList.remove("hidden");
       $("mi-ficha-contenido").textContent = "Consultando tu ficha...";
       peticionAutenticada("/clientes/me/").then(ficha => {
         $("mi-ficha-contenido").textContent =
           `${ficha.nombre} ${ficha.apellidos}\nTeléfono: ${ficha.telefono || "Sin registrar"}\nCorreo: ${ficha.correo || "Sin registrar"}\nDirección: ${ficha.direccion || "Sin registrar"}`;
       }).catch(error => { $("mi-ficha-contenido").textContent = error.message; });
+    } else {
+      $("catalogo-abrir-sesion").classList.remove("hidden");
     }
   }
 
@@ -149,11 +159,42 @@
   $("sigep-tab-usuarios").addEventListener("click", () => cambiarVistaSIGEP("usuarios"));
   $("sigep-tab-productos").addEventListener("click", () => cambiarVistaSIGEP("productos"));
 
+  function abrirCatalogo(origen) {
+    origenCatalogo = origen;
+    for (const id of ["auth-card", "session-panel", "clientes-panel"]) $(id).classList.add("hidden");
+    $("catalogo-visitante-panel").classList.remove("hidden");
+    $("catalogo-logout").hidden = !sesion;
+    $("catalogo-volver").textContent = origen === "invitado" ? "Iniciar sesión" : "Volver al panel";
+    window.SIGEPCatalogo?.mostrar("catalogo-visitante-contenido");
+  }
+
+  function volverCatalogo() {
+    window.SIGEPCatalogo?.cerrarDetalle();
+    $("catalogo-visitante-panel").classList.add("hidden");
+    if (!sesion || origenCatalogo === "invitado") $("auth-card").classList.remove("hidden");
+    else if (origenCatalogo === "administracion") $("clientes-panel").classList.remove("hidden");
+    else {
+      $("session-panel").classList.remove("hidden");
+      if (sesion.usuario?.rol?.codigo === "CLIENTE") window.SIGEPCatalogo?.mostrar("catalogo-en-sesion");
+    }
+    origenCatalogo = null;
+  }
+
+  $("catalogo-abrir-visitante").addEventListener("click", () => abrirCatalogo("invitado"));
+  $("catalogo-abrir-panel").addEventListener("click", () => abrirCatalogo("administracion"));
+  $("catalogo-abrir-sesion").addEventListener("click", () => abrirCatalogo("sesion"));
+  $("catalogo-volver").addEventListener("click", volverCatalogo);
+
   function cerrarSesionLocal() {
     sesion = null;
     window.SIGEPClientes?.detener();
     window.SIGEPUsuarios?.detener();
     window.SIGEPProductos?.detener();
+    window.SIGEPCatalogo?.cerrarDetalle();
+    origenCatalogo = null;
+    $("catalogo-visitante-panel").classList.add("hidden");
+    $("session-panel").classList.remove("catalogo-sesion-activa");
+    $("catalogo-en-sesion").classList.add("hidden");
     $("clientes-panel").classList.add("hidden");
     $("mi-ficha").classList.add("hidden");
     $("session-panel").classList.add("hidden");
@@ -173,7 +214,7 @@
       const tokens = await peticion("/auth/login/", "POST", { username, password });
       if (!tokens?.access || !tokens?.refresh) throw new Error("La API no devolvió los tokens esperados.");
       const perfil = await peticion("/usuarios/me/", "GET", null, tokens.access);
-      sesion = { access: tokens.access, refresh: tokens.refresh };
+      sesion = { access: tokens.access, refresh: tokens.refresh, usuario: perfil };
       $("login-password").value = "";
       mostrarSesion(perfil);
     } catch (error) {
@@ -234,6 +275,7 @@
   }
   $("logout-button").addEventListener("click", () => cerrarSesion($("logout-button")));
   $("clientes-logout-button").addEventListener("click", () => cerrarSesion($("clientes-logout-button")));
+  $("catalogo-logout").addEventListener("click", () => cerrarSesion($("catalogo-logout")));
 
   $("forgot-password").addEventListener("click", (event) => {
     event.preventDefault();
