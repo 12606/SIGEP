@@ -83,6 +83,7 @@
     <!-- Estilos exclusivos del módulo de clientes (Fase 2) -->
     <link rel="stylesheet" href="{% static 'clientes.css' %}">
     <link rel="stylesheet" href="{% static 'productos.css' %}">
+    <link rel="stylesheet" href="{% static 'catalogo.css' %}">
 </head>
 <body class="bg-bakery-vanilla min-h-screen flex items-center justify-center p-4 selection:bg-bakery-pink selection:text-white relative overflow-x-hidden">
     
@@ -266,6 +267,9 @@
             </div>
 
         </div>
+        <div class="px-8 pb-7 pt-1 text-center">
+          <button id="catalogo-abrir-visitante" class="text-bakery-brownLight font-bold hover:text-bakery-pink underline underline-offset-4" type="button">Explorar el catálogo sin iniciar sesión</button>
+        </div>
     </main>
 
     <!-- Vista provisional posterior al login, antes del dashboard real de SIGEP -->
@@ -279,9 +283,25 @@
             <h3 class="font-bold text-bakery-brown mb-2">Mi ficha de cliente</h3>
             <p id="mi-ficha-contenido" class="text-sm text-bakery-brownLight whitespace-pre-line"></p>
         </div>
+        <div id="catalogo-en-sesion" class="hidden" aria-label="Catálogo disponible para clientes"></div>
+        <button id="catalogo-abrir-sesion" type="button" class="hidden catalogo-button catalogo-button-primary mb-4">Explorar catálogo de productos</button>
         <button id="logout-button" type="button" class="w-full bg-bakery-pink hover:bg-bakery-pinkHover text-white font-bold py-3 rounded-2xl transition-colors">Cerrar sesión</button>
     </section>
 
+
+    <!-- FASE 3: Vista del catálogo para visitantes y vista previa desde otras cuentas -->
+    <section id="catalogo-visitante-panel" class="hidden catalogo-visitante-shell relative z-10" aria-label="Catálogo de Dulce Encanto">
+      <header class="catalogo-visitante-header">
+        <div class="catalogo-brand"><span aria-hidden="true" style="font-size:2rem">🧁</span>
+          <span><strong>Dulce Encanto</strong><small>Catálogo de pasteles y postres</small></span>
+        </div>
+        <div class="catalogo-header-actions">
+          <button id="catalogo-volver" class="catalogo-button" type="button">Volver</button>
+          <button id="catalogo-logout" class="catalogo-button catalogo-button-primary" type="button" hidden>Cerrar sesión</button>
+        </div>
+      </header>
+      <div id="catalogo-visitante-contenido"></div>
+    </section>
 
     <!-- FASE 2: módulo de clientes visible únicamente para ADMIN y VENTAS -->
     <section id="clientes-panel" class="hidden sigep-dashboard-shell relative z-10" aria-label="Gestión de clientes">
@@ -291,6 +311,7 @@
             <span><strong>Dulce Encanto</strong><small>SIGEP · Panel de gestión</small></span>
           </div>
           <div class="sigep-header-right"><span id="clientes-usuario" class="sigep-user"></span>
+            <button id="catalogo-abrir-panel" class="sigep-button sigep-button-outline" type="button">Ver catálogo como cliente</button>
             <button id="clientes-logout-button" class="sigep-button sigep-button-outline" type="button">Cerrar sesión</button>
           </div>
         </header>
@@ -553,5 +574,6 @@
     <script src="{% static 'clientes.js' %}" defer></script>
     <script src="{% static 'usuarios.js' %}" defer></script>
     <script src="{% static 'productos.js' %}" defer></script>
+    <script src="{% static 'catalogo.js' %}" defer></script>
 </body>
 </html>
