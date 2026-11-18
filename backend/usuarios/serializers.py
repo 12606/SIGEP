@@ -191,3 +191,56 @@ class RegistroPublicoSerializer(serializers.ModelSerializer):
                 direccion=direccion,
             )
         return usuario
+
+
+class MiPerfilEdicionSerializer(serializers.ModelSerializer):
+    """Lista blanca de campos editables por el dueño de la cuenta."""
+
+    class Meta:
+        model = Usuario
+        fields = ("first_name", "last_name", "email", "telefono")
+        extra_kwargs = {
+            "first_name": {"allow_blank": False},
+            "last_name": {"allow_blank": False},
+            "email": {"allow_blank": False},
+        }
+
+    def validate(self, attrs):
+        extras = set(self.initial_data.keys()) - set(self.fields.keys())
+        if extras:
+            raise serializers.ValidationError({"campos": "No puedes modificar: " + ", ".join(sorted(extras))})
+        return attrs
+
+    def validate_email(self, value):
+        correo = value.strip().lower()
+        if Usuario.objects.filter(email__iexact=correo).exclude(pk=self.instance.pk).exists():
+            raise serializers.ValidationError("Ese correo ya está registrado.")
+        return correo
+
+    def validate_telefono(self, value):
+        numero = value.strip()
+        if numero and not 10 <= len(re.sub(r"\D", "", numero)) <= 15:
+            raise serializers.ValidationError("Introduce un teléfono de 10 a 15 dígitos.")
+        return numero
+
+    @transaction.atomic
+    def update(self, instance, validated_data):
+        for campo, valor in validated_data.items():
+            setattr(instance, campo, valor)
+        if validated_data:
+            instance.save(update_fields=list(validated_data.keys()))
+            # Mantener la ficha comercial vinculada consistente con la cuenta.
+            from clientes.models import Cliente
+            from django.utils import timezone
+            datos_ficha = {campo: getattr(instance, campo_usuario) for campo, campo_usuario in {
+                "nombre": "first_name", "apellidos": "last_name",
+                "correo": "email", "telefono": "telefono",
+            }.items() if campo_usuario in validated_data}
+            if datos_ficha:
+                Cliente.objects.filter(usuario=instance).update(
+                    fecha_actualizacion=timezone.now(), **datos_ficha
+                )
+        return instance
+
+    def to_representation(self, instance):
+        return UsuarioSerializer(instance).data

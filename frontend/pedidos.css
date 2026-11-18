@@ -1,0 +1,38 @@
+/* Fase 4 - componentes adicionales sin sustituir los estilos de clientes/productos. */
+.pedidos-sesion-ancha { max-width: 940px !important; width: min(100%,940px) !important; }
+.pedidos-shell { margin-top: 24px; text-align: left; }
+.pedidos-barra {display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap;margin-bottom:16px}
+.pedidos-barra h3 {color:#5C3D2E;font-weight:800;font-size:1.18rem}
+.pedidos-barra .pedidos-botones {display:flex;gap:9px;flex-wrap:wrap}
+.pedidos-lista {display:grid;grid-template-columns:repeat(auto-fill,minmax(225px,1fr));gap:13px;}
+.pedidos-card {border:1px solid #F1DCE4;border-radius:18px;padding:18px;background:white;text-align:left;display:flex;flex-direction:column;gap:9px;box-shadow:0 3px 12px #5C3D2E0A}
+.pedidos-card-head {display:flex;justify-content:space-between;gap:8px;align-items:flex-start;color:#5C3D2E}
+.pedidos-estado {background:#FFF0F6;color:#973E61;font-size:.78rem;font-weight:800;border-radius:22px;padding:5px 10px}
+.pedidos-card p {font-size:.86rem;color:#8B5E3C}
+.pedidos-card button {align-self:flex-start;margin-top:auto}
+.pedidos-sin-resultados {padding:18px;color:#8B5E3C}
+.pedidos-alerta {padding:12px 14px;margin:12px 0;border-radius:12px;font-size:.9rem}
+.pedidos-ok {background:#E5F4E9;color:#245D37}
+.pedidos-error {background:#FFF1F1;color:#A12B35}
+.pedidos-linea {display:grid;grid-template-columns:minmax(130px,2fr) 80px minmax(130px,2fr) auto;gap:8px;align-items:center;margin:10px 0}
+.pedidos-linea select,.pedidos-linea input {width:100%;min-width:0;border:1px solid #E6CCD5;border-radius:10px;padding:10px;background:white;color:#5C3D2E}
+.pedidos-dialog {width:min(760px,calc(100% - 24px));max-height:92vh;overflow-y:auto;box-sizing:border-box;border:0;border-radius:22px;padding:28px;background:#FFF;color:#5C3D2E;box-shadow:0 30px 70px #1B091936}
+.pedidos-dialog::backdrop {background:rgba(35,20,28,.55)}
+.pedidos-dialog h2 {font-size:1.45rem;font-weight:800;color:#5C3D2E}
+.pedidos-dialog h3 {font-size:1.08rem;font-weight:800;margin:18px 0 8px}
+.pedidos-dialog-header {display:flex;justify-content:space-between;gap:14px;align-items:center;margin-bottom:15px}
+.pedidos-form-campos {display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.pedidos-form-campos label,.pedidos-pago-campos label {font-size:.84rem;font-weight:700;display:flex;flex-direction:column;gap:5px}
+.pedidos-form-campos label input,.pedidos-form-campos label select,.pedidos-form-campos label textarea,.pedidos-pago-campos input,.pedidos-pago-campos select {width:100%;border:1px solid #E6CCD5;border-radius:12px;padding:11px;background:#FFF;color:#5C3D2E}
+.pedidos-form-campos .pedidos-span2 {grid-column:span 2}
+.pedidos-dialog-acciones {display:flex;justify-content:flex-end;gap:12px;align-items:center;flex-wrap:wrap;margin-top:18px}
+.pedidos-total {background:#FFF5E4;padding:12px;border-radius:12px;font-weight:700;margin-top:15px}
+.pedidos-resumen {display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;padding:14px;background:#FFF5E4;border-radius:14px}
+.pedidos-resumen p {font-size:.9rem}
+.pedidos-detalle-lista {list-style:none;margin:8px 0;padding:0}
+.pedidos-detalle-lista li {padding:9px 0;border-bottom:1px solid #F6E2E9;font-size:.92rem}
+.pedidos-detalle-lista small {display:block;color:#8B5E3C;margin-top:5px}
+.pedidos-estado-acciones {display:flex;gap:8px;flex-wrap:wrap;margin-top:13px}
+.pedidos-pago-campos {display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+[hidden] {display:none!important}
+@media (max-width:640px){.pedidos-linea{grid-template-columns:1fr 80px}.pedidos-linea input:nth-of-type(2){grid-column:1}.pedidos-form-campos{grid-template-columns:1fr}.pedidos-form-campos .pedidos-span2{grid-column:1}.pedidos-pago-campos{grid-template-columns:1fr}.pedidos-resumen{grid-template-columns:1fr}.pedidos-dialog{padding:18px}}

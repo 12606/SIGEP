@@ -61,16 +61,16 @@
       tr.appendChild(contacto);
       celda(tr, cliente.direccion);
       const columnaCuenta = document.createElement("td");
-      if (cliente.cuenta) {
+      if (esAdmin && cliente.cuenta) {
         const usuario = document.createElement("div");
         usuario.textContent = cliente.cuenta.username;
         const rol = document.createElement("small");
         rol.textContent = `Rol: ${cliente.cuenta.rol_nombre || cliente.cuenta.rol_codigo || "Sin rol"}`;
         columnaCuenta.append(usuario, rol);
-      } else {
+      } else if (esAdmin) {
         columnaCuenta.textContent = cliente.usuario != null ? "Vinculada" : "Mostrador";
       }
-      tr.appendChild(columnaCuenta);
+      if (esAdmin) tr.appendChild(columnaCuenta);
       const estado = document.createElement("td");
       const insignia = document.createElement("span");
       insignia.className = `sigep-status ${cliente.activo ? "sigep-status-on" : "sigep-status-off"}`;
@@ -81,7 +81,9 @@
       const grupo = document.createElement("div");
       grupo.className = "sigep-row-actions";
       grupo.appendChild(accion("Editar", "sigep-action-edit", () => abrirEditar(cliente)));
-      grupo.appendChild(accion(cliente.activo ? "Desactivar" : "Activar", "sigep-action-toggle", () => cambiarEstado(cliente)));
+      if (esAdmin) {
+        grupo.appendChild(accion(cliente.activo ? "Desactivar ficha" : "Activar ficha", "sigep-action-toggle", () => cambiarEstado(cliente)));
+      }
       if (esAdmin && cliente.usuario != null) {
         grupo.appendChild(accion("Cambiar rol", "sigep-action-edit", () => window.SIGEPUsuarios?.abrirEditarId(cliente.usuario)));
       }
@@ -174,7 +176,8 @@
 
   async function cambiarEstado(cliente) {
     const nuevo = !cliente.activo;
-    if (!confirm(`¿Deseas ${nuevo ? "activar" : "desactivar"} a ${cliente.nombre} ${cliente.apellidos}?`)) return;
+    if (!esAdmin) return mostrarAviso("Solo ADMIN puede cambiar el estado de una ficha.", true);
+    if (!confirm(`¿Deseas ${nuevo ? "activar" : "desactivar"} la ficha comercial de ${cliente.nombre} ${cliente.apellidos}?`)) return;
     try {
       await request(`/clientes/${cliente.id}/estado/`, "PATCH", { activo: nuevo });
       if (!conectado) return;
@@ -190,6 +193,7 @@
     request = fetchAutorizado;
     conectado = true;
     esAdmin = usuario.rol?.codigo === "ADMIN" || usuario.is_superuser === true;
+    $("clientes-cuenta-col").hidden = !esAdmin;
     $("clientes-buscar").value = "";
     $("clientes-estado-filtro").value = "";
     $("clientes-usuario").textContent = `${usuario.first_name || usuario.username} · ${usuario.rol?.nombre || "Personal"}`;

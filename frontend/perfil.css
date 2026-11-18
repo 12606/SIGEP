@@ -1,0 +1,16 @@
+/* SIGEP · Perfil personal, independiente del dashboard. */
+.sigep-perfil-shell{width:min(760px,100%);margin:25px auto;font-family:Nunito,system-ui,sans-serif;color:#533b34}
+.sigep-perfil-card{background:#fff;border-radius:22px;border:1px solid #f2e1e6;box-shadow:0 18px 55px rgba(115,70,87,.11);padding:30px}
+.sigep-perfil-top{display:flex;justify-content:space-between;gap:14px;align-items:flex-start;border-bottom:1px solid #f4e8eb;padding-bottom:23px;margin-bottom:22px}
+.sigep-perfil-top h2{font-size:28px;font-weight:900;margin:5px 0;color:#583b36}
+.sigep-perfil-top p{font-size:13px;color:#977c78;line-height:1.5;max-width:480px}
+.sigep-perfil-campos{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:17px}
+.sigep-perfil-campos label{font-size:12px;font-weight:800;color:#755c59}
+.sigep-perfil-campos input{display:block;width:100%;margin-top:7px;padding:12px 14px;border:1px solid #e9dfe2;border-radius:10px;background:#fff;color:#523b34;outline:none;font-size:14px}
+.sigep-perfil-campos input:focus{border-color:#ff94b7;box-shadow:0 0 0 3px rgba(255,148,183,.15)}
+.sigep-perfil-ancho{grid-column:span 2}
+.sigep-perfil-sololectura{background:#fff7f8;border-radius:12px;padding:14px 17px;margin-top:22px;font-size:12px;color:#846667;display:flex;gap:24px;flex-wrap:wrap}
+.sigep-perfil-acciones{display:flex;justify-content:flex-end;margin-top:22px}
+#perfil-panel[hidden],#perfil-direccion-contenedor[hidden]{display:none!important}
+#perfil-panel #perfil-feedback{margin:0 0 20px}
+@media(max-width:620px){.sigep-perfil-shell{margin:12px auto}.sigep-perfil-card{padding:20px}.sigep-perfil-top{flex-direction:column}.sigep-perfil-campos{grid-template-columns:1fr}.sigep-perfil-ancho{grid-column:auto}}
