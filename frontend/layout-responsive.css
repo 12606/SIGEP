@@ -1,0 +1,169 @@
+/* SIGEP · Rediseño responsivo de las vistas posteriores al acceso.
+   Mantiene intactos el login, las APIs, las validaciones y los permisos. */
+
+/* Ancho de trabajo real: antes había límites acumulados de 512px, 940px y 1180px. */
+#session-panel.sigep-session-shell {
+  box-sizing: border-box;
+  display: block;
+  width: min(1480px, 100%) !important;
+  max-width: 1480px !important;
+  margin: 10px auto;
+  padding: 0 !important;
+  text-align: left;
+  color: #5c3d2e;
+  background: #fff;
+  border: 1px solid #f2dfe5;
+  border-radius: 26px;
+  box-shadow: 0 22px 70px rgba(86, 47, 57, 0.12);
+  overflow: hidden;
+}
+#session-panel.sigep-session-shell.hidden { display: none !important; }
+
+/* Encabezado horizontal: usuario y acciones en una sola franja. */
+.sigep-session-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 20px;
+  padding: 20px clamp(20px, 2.7vw, 38px);
+  border-bottom: 1px solid #f3e1e6;
+  background: linear-gradient(110deg, #fffdfc 0%, #fff5f7 100%);
+}
+.sigep-session-brand { display: flex; align-items: center; gap: 15px; min-width: 0; }
+.sigep-session-avatar {
+  width: 54px;
+  height: 54px;
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  border-radius: 16px;
+  background: #ffe3e8;
+  font-size: 27px;
+}
+.sigep-session-identity { min-width: 0; }
+.sigep-session-eyebrow {
+  display: block;
+  color: #b76a85;
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: .12em;
+  margin-bottom: 4px;
+}
+.sigep-session-identity h2 { font-size: clamp(23px, 2.2vw, 30px); line-height: 1.13; margin: 0 0 5px; }
+.sigep-session-name { font-size: 14px; font-weight: 850; line-height: 1.4; margin: 0; }
+.sigep-session-role { color: #94716e; font-size: 12px; margin: 1px 0 0; }
+.sigep-session-actions { display: flex; align-items: center; gap: 9px; flex-wrap: wrap; }
+.sigep-session-actions .sigep-button,
+.sigep-session-actions .catalogo-button { min-height: 40px; padding: 10px 16px; }
+.sigep-session-actions #logout-button { background: #fff; }
+
+/* El cliente ve catálogo y pedidos simultáneamente, sin una gran columna vacía. */
+.sigep-session-main { padding: clamp(18px, 2.4vw, 34px); min-width: 0; }
+#session-panel.catalogo-sesion-activa .sigep-session-main {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(300px, 355px);
+  gap: clamp(18px, 2vw, 28px);
+  align-items: start;
+}
+#session-panel.catalogo-sesion-activa #catalogo-en-sesion { min-width: 0; }
+#session-panel.catalogo-sesion-activa .catalogo-root { margin-top: 0; }
+#session-panel.catalogo-sesion-activa #pedidos-cliente-panel {
+  margin: 0;
+  padding: 21px;
+  background: #fff8f9;
+  border: 1px solid #f1dfe4;
+  border-radius: 20px;
+}
+#session-panel.catalogo-sesion-activa #pedidos-cliente-panel .pedidos-barra {
+  align-items: flex-start;
+  margin-bottom: 14px;
+}
+#session-panel.catalogo-sesion-activa #pedidos-cliente-panel .pedidos-lista { grid-template-columns: 1fr; }
+#session-panel.catalogo-sesion-activa #pedidos-cliente-panel .pedidos-botones { gap: 7px; }
+#session-panel.catalogo-sesion-activa #pedidos-cliente-panel .pedidos-card { box-shadow: none; }
+
+/* Banner compacto: menos alto y mucho más contenido visible sin desplazarse. */
+#session-panel .catalogo-hero,
+.catalogo-visitante-shell .catalogo-hero {
+  padding: clamp(18px, 2.1vw, 24px);
+  margin-bottom: 18px;
+  border-radius: 18px;
+}
+#session-panel .catalogo-hero h2,
+.catalogo-visitante-shell .catalogo-hero h2 { font-size: clamp(24px, 2.5vw, 31px); margin: 5px 0; }
+#session-panel .catalogo-hero p,
+.catalogo-visitante-shell .catalogo-hero p { max-width: 800px; font-size: 13px; line-height: 1.55; }
+#session-panel .catalogo-controls,
+.catalogo-visitante-shell .catalogo-controls { margin-bottom: 10px; }
+#session-panel .catalogo-count,
+.catalogo-visitante-shell .catalogo-count { margin-bottom: 12px; }
+
+/* Tarjetas que se adaptan al ancho, sin estirarse de manera exagerada. */
+#session-panel .catalogo-grid,
+.catalogo-visitante-shell .catalogo-grid {
+  grid-template-columns: repeat(auto-fill, minmax(min(215px, 100%), 1fr));
+  gap: 16px;
+}
+#session-panel .catalogo-photo,
+.catalogo-visitante-shell .catalogo-photo { aspect-ratio: 5 / 4; }
+#session-panel .catalogo-card-body,
+.catalogo-visitante-shell .catalogo-card-body { padding: 14px; }
+#session-panel .catalogo-desc,
+.catalogo-visitante-shell .catalogo-desc {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+  overflow: hidden;
+}
+#session-panel .catalogo-card-footer,
+.catalogo-visitante-shell .catalogo-card-footer { flex-wrap: wrap; }
+#session-panel .catalogo-card-footer .catalogo-button,
+.catalogo-visitante-shell .catalogo-card-footer .catalogo-button { white-space: nowrap; }
+
+/* Personal administrativo, visitantes y perfil también aprovechan la pantalla. */
+.sigep-dashboard-shell { width: min(1480px, 100%); }
+.catalogo-visitante-shell { width: min(1480px, 100%); box-sizing: border-box; }
+#perfil-panel.sigep-perfil-shell { width: min(960px, 100%); }
+
+/* El repostero dispone de un tablero amplio, sin competir con un panel vacío. */
+#session-panel .pedidos-lista { grid-template-columns: repeat(auto-fill, minmax(235px, 1fr)); }
+#session-panel.catalogo-sesion-activa #pedidos-cliente-panel .pedidos-lista { grid-template-columns: 1fr; }
+
+@media (max-width: 1120px) {
+  #session-panel.catalogo-sesion-activa .sigep-session-main { grid-template-columns: minmax(0, 1fr); }
+  #session-panel.catalogo-sesion-activa #pedidos-cliente-panel { margin-top: 4px; }
+  #session-panel.catalogo-sesion-activa #pedidos-cliente-panel .pedidos-lista {
+    grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  }
+}
+@media (max-width: 760px) {
+  .sigep-session-top { padding: 18px 19px; align-items: flex-start; }
+  .sigep-session-actions { width: 100%; }
+  .sigep-session-actions .sigep-button, .sigep-session-actions .catalogo-button {
+    flex: 1 1 auto;
+    text-align: center;
+  }
+  .sigep-session-main { padding: 17px; }
+  #session-panel.sigep-session-shell { border-radius: 20px; }
+  #session-panel .catalogo-controls { grid-template-columns: 1fr 1fr; }
+  #session-panel .catalogo-controls .catalogo-button { grid-column: 1/-1; }
+  .sigep-header-right { flex-wrap: wrap; }
+}
+@media (max-width: 520px) {
+  .sigep-session-avatar { width: 46px; height: 46px; font-size: 23px; }
+  .sigep-session-identity h2 { font-size: 23px; }
+  .sigep-session-eyebrow { font-size: 9px; }
+  .sigep-session-main { padding: 14px; }
+  #session-panel .catalogo-controls { grid-template-columns: 1fr; }
+  #session-panel .catalogo-controls .catalogo-button { grid-column: auto; }
+  #session-panel .catalogo-grid { grid-template-columns: 1fr; }
+  #session-panel.catalogo-sesion-activa #pedidos-cliente-panel { padding: 16px; }
+  #session-panel.catalogo-sesion-activa #pedidos-cliente-panel .pedidos-lista { grid-template-columns: 1fr; }
+  .sigep-session-actions { gap: 7px; }
+  .sigep-session-actions .sigep-button, .sigep-session-actions .catalogo-button { font-size: 11px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  #session-panel.sigep-session-shell { animation: none !important; }
+}

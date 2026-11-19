@@ -128,7 +128,7 @@
       <div class="catalogo-hero">
         <div class="catalogo-hero-kicker">DULCE ENCANTO · CATÁLOGO</div>
         <h2>Elige tu próximo antojo</h2>
-        <p>Explora nuestros pasteles y postres, mira sus fotografías y conoce los precios. Los pedidos estarán disponibles próximamente.</p>
+        <p>Descubre nuestros pasteles y postres, consulta sus detalles y precios. Si tienes una cuenta de cliente, puedes solicitar tu pedido desde esta misma página.</p>
       </div>
       <div class="catalogo-controls">
         <label class="catalogo-field">Buscar producto<input data-buscar type="search" maxlength="120" placeholder="Pastel, chocolate, cupcake..."></label>

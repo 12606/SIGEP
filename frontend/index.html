@@ -86,6 +86,9 @@
     <link rel="stylesheet" href="{% static 'catalogo.css' %}">
     <link rel="stylesheet" href="{% static 'pedidos.css' %}">
     <link rel="stylesheet" href="{% static 'perfil.css' %}">
+    <link rel="stylesheet" href="{% static 'inventario.css' %}">
+    <!-- Diseño responsivo general; cargar al final para priorizar sus ajustes. -->
+    <link rel="stylesheet" href="{% static 'layout-responsive.css' %}">
 </head>
 <body class="bg-bakery-vanilla min-h-screen flex items-center justify-center p-4 selection:bg-bakery-pink selection:text-white relative overflow-x-hidden">
     
@@ -274,14 +277,25 @@
         </div>
     </main>
 
-    <!-- Vista provisional posterior al login, antes del dashboard real de SIGEP -->
-    <section id="session-panel" class="hidden w-full max-w-lg bg-white rounded-[2rem] shadow-xl p-9 relative z-10 text-center" aria-live="polite">
-        <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-bakery-cream text-3xl mb-4">🧁</div>
-        <h2 class="font-cursive text-3xl text-bakery-brown mb-2">¡Bienvenido a Dulce Encanto!</h2>
-        <p id="session-name" class="text-bakery-brown font-bold text-lg mb-1"></p>
-        <p id="session-role" class="text-bakery-brownLight text-sm mb-5"></p>
-        <p class="text-gray-500 text-sm mb-6">Explora los módulos disponibles para tu cuenta.</p>
-        <button id="perfil-abrir-sesion" type="button" class="sigep-button sigep-button-outline mb-5 w-full">Mi perfil · Ver y editar datos</button>
+    <!-- Inicio compacto para CLIENTE / REPOSTERO. El login mantiene su diseño original. -->
+    <section id="session-panel" class="hidden sigep-session-shell relative z-10" aria-live="polite">
+        <header class="sigep-session-top">
+          <div class="sigep-session-brand">
+            <span class="sigep-session-avatar" aria-hidden="true">🧁</span>
+            <div class="sigep-session-identity">
+              <span class="sigep-session-eyebrow">DULCE ENCANTO · MI ESPACIO</span>
+              <h2 class="font-cursive">¡Bienvenido a Dulce Encanto!</h2>
+              <p id="session-name" class="sigep-session-name"></p>
+              <p id="session-role" class="sigep-session-role"></p>
+            </div>
+          </div>
+          <div class="sigep-session-actions">
+            <button id="perfil-abrir-sesion" type="button" class="sigep-button sigep-button-outline">Mi perfil</button>
+            <button id="catalogo-abrir-sesion" type="button" class="hidden catalogo-button catalogo-button-primary">Ver catálogo</button>
+            <button id="logout-button" type="button" class="sigep-button sigep-button-outline">Cerrar sesión</button>
+          </div>
+        </header>
+        <div class="sigep-session-main">
         <div id="catalogo-en-sesion" class="hidden" aria-label="Catálogo disponible para clientes"></div>
         <!-- Fase 4: cliente, pedidos propios -->
         <div id="pedidos-cliente-panel" class="pedidos-shell" hidden>
@@ -300,8 +314,15 @@
           <p id="pedidos-produccion-aviso" role="status" hidden></p>
           <div id="pedidos-produccion-lista" class="pedidos-lista"></div>
         </div>
-        <button id="catalogo-abrir-sesion" type="button" class="hidden catalogo-button catalogo-button-primary mb-4">Explorar catálogo de productos</button>
-        <button id="logout-button" type="button" class="w-full bg-bakery-pink hover:bg-bakery-pinkHover text-white font-bold py-3 rounded-2xl transition-colors">Cerrar sesión</button>
+        <!-- Fase 5: REPOSTERO consulta existencias sin costos ni movimientos. -->
+        <div id="inventario-repostero-panel" class="inventario-repostero" hidden>
+          <div class="pedidos-barra"><h3>Existencias de ingredientes</h3>
+            <button id="inventario-actualizar-repostero" type="button" class="sigep-button sigep-button-outline">Actualizar</button>
+          </div>
+          <p id="inventario-repostero-aviso" role="status" hidden></p>
+          <div id="inventario-repostero-lista"></div>
+        </div>
+        </div><!-- /sigep-session-main -->
     </section>
 
 
@@ -366,6 +387,7 @@
             <button id="sigep-tab-usuarios" type="button" class="sigep-tab" aria-selected="false">Usuarios y roles</button>
             <button id="sigep-tab-productos" type="button" class="sigep-tab" aria-selected="false">Productos</button>
             <button id="sigep-tab-pedidos" type="button" class="sigep-tab" aria-selected="false">Pedidos y pagos</button>
+            <button id="sigep-tab-inventario" type="button" class="sigep-tab" aria-selected="false" hidden>Inventario</button>
           </nav>
           <div id="sigep-vista-clientes">
           <div class="sigep-kicker">ADMINISTRACIÓN / CLIENTES</div>
@@ -512,9 +534,81 @@
               <p id="pedidos-tabla-vacia" class="sigep-empty" hidden>No existen pedidos con ese estado.</p>
             </div>
           </div><!-- /sigep-vista-pedidos -->
+
+          <!-- Fase 5: ADMIN y ALMACEN administran inventario. -->
+          <div id="sigep-vista-inventario" hidden>
+            <div class="sigep-kicker">ADMINISTRACIÓN / INVENTARIO</div>
+            <div class="sigep-intro"><div><h1>Ingredientes e inventario</h1><p>Control de materias primas, entradas, salidas y alertas de stock.</p></div>
+              <button id="inventario-nuevo" type="button" class="sigep-button sigep-button-primary">+ Nuevo ingrediente</button>
+            </div>
+            <div class="sigep-stats">
+              <div class="sigep-stat"><span>Ingredientes encontrados</span><strong id="inventario-total">0</strong></div>
+              <div class="sigep-stat"><span>Existencias bajas</span><strong id="inventario-alertas-total">0</strong></div>
+              <div class="sigep-stat"><span>Inactivos</span><strong id="inventario-inactivos">0</strong></div>
+            </div>
+            <div class="sigep-list-card">
+              <div class="sigep-list-top"><div><h2>Listado de ingredientes</h2><p>El stock se calcula mediante movimientos, no se edita directamente.</p></div>
+                <button id="inventario-actualizar" type="button" class="sigep-button sigep-button-outline">Actualizar</button></div>
+              <div class="sigep-filters">
+                <label class="sigep-filter-search">Buscar ingrediente<input id="inventario-buscar" type="search" placeholder="Nombre o descripción"></label>
+                <label class="sigep-filter-status">Estado<select id="inventario-filtro-estado"><option value="">Todos</option><option value="true">Activos</option><option value="false">Inactivos</option></select></label>
+              </div>
+              <p id="inventario-aviso" role="status" hidden></p>
+              <div class="sigep-table-scroll"><table class="sigep-table"><thead><tr>
+                <th>Ingrediente</th><th>Existencia</th><th>Stock mínimo</th><th>Costo unitario</th><th>Estado</th><th>Acciones</th>
+              </tr></thead><tbody id="inventario-tabla"></tbody></table></div>
+              <p id="inventario-vacio" class="sigep-empty" hidden>No hay ingredientes registrados.</p>
+            </div>
+            <div class="sigep-list-card inventario-separador">
+              <div class="sigep-list-top"><div><h2>Historial de movimientos</h2><p>Entradas, salidas y mermas registrados por empleados.</p></div></div>
+              <div class="sigep-table-scroll"><table class="sigep-table"><thead><tr>
+                <th>Fecha</th><th>Ingrediente</th><th>Tipo</th><th>Cantidad</th><th>Registrado por</th><th>Motivo</th>
+              </tr></thead><tbody id="inventario-historial"></tbody></table></div>
+              <p id="inventario-historial-vacio" class="sigep-empty" hidden>No se han registrado movimientos.</p>
+            </div>
+          </div><!-- /sigep-vista-inventario -->
         </div>
       </div>
     </section>
+
+    <!-- Fase 5: alta y edición de ingredientes. -->
+    <dialog id="inventario-ingrediente-dialog" class="inventario-dialog" aria-labelledby="inventario-ingrediente-titulo">
+      <form id="inventario-ingrediente-form">
+        <div class="inventario-dialog-head"><h2 id="inventario-ingrediente-titulo">Nuevo ingrediente</h2>
+          <button id="inventario-ingrediente-cerrar" class="sigep-close" type="button" aria-label="Cerrar">×</button></div>
+        <div class="inventario-dialog-campos">
+          <label>Nombre *<input id="inventario-ingrediente-nombre" maxlength="120" required></label>
+          <label>Unidad base *<select id="inventario-ingrediente-unidad" required>
+            <option value="KG">Kilogramo</option><option value="G">Gramo</option><option value="L">Litro</option>
+            <option value="ML">Mililitro</option><option value="PIEZA">Pieza</option>
+          </select></label>
+          <label class="ancho">Descripción<input id="inventario-ingrediente-descripcion" maxlength="250"></label>
+          <label>Stock mínimo *<input id="inventario-ingrediente-minimo" type="number" min="0" step="0.001" value="0.000" required></label>
+          <label>Costo unitario ($) *<input id="inventario-ingrediente-costo" type="number" min="0" step="0.01" value="0.00" required></label>
+        </div>
+        <p id="inventario-ingrediente-aviso" role="status" hidden></p>
+        <div class="inventario-dialog-acciones"><button id="inventario-ingrediente-guardar" type="submit" class="sigep-button sigep-button-primary">Guardar ingrediente</button></div>
+      </form>
+    </dialog>
+
+    <!-- Fase 5: un movimiento constituye un asiento permanente de stock. -->
+    <dialog id="inventario-movimiento-dialog" class="inventario-dialog" aria-labelledby="inventario-movimiento-titulo">
+      <form id="inventario-movimiento-form">
+        <div class="inventario-dialog-head"><h2 id="inventario-movimiento-titulo">Nuevo movimiento</h2>
+          <button id="inventario-movimiento-cerrar" class="sigep-close" type="button" aria-label="Cerrar">×</button></div>
+        <p id="inventario-movimiento-nombre" class="inventario-muted"></p>
+        <input type="hidden" id="inventario-movimiento-id">
+        <div class="inventario-dialog-campos">
+          <label>Tipo *<select id="inventario-movimiento-tipo" required>
+            <option value="ENTRADA">Entrada</option><option value="SALIDA">Salida</option><option value="MERMA">Merma</option>
+          </select></label>
+          <label>Cantidad (unidad base) *<input id="inventario-movimiento-cantidad" type="number" min="0.001" step="0.001" required></label>
+          <label class="ancho">Motivo *<textarea id="inventario-movimiento-motivo" maxlength="250" rows="2" required placeholder="Compra de insumos, consumo, producto dañado…"></textarea></label>
+        </div>
+        <p id="inventario-movimiento-aviso" role="status" hidden></p>
+        <div class="inventario-dialog-acciones"><button id="inventario-movimiento-guardar" class="sigep-button sigep-button-primary" type="submit">Registrar movimiento</button></div>
+      </form>
+    </dialog>
 
     <!-- Fase 4: captura de pedido, precio final calculado por Django -->
     <dialog id="pedido-dialog" class="pedidos-dialog" aria-labelledby="pedido-dialog-titulo">
@@ -690,5 +784,6 @@
     <script src="{% static 'catalogo.js' %}" defer></script>
     <script src="{% static 'pedidos.js' %}" defer></script>
     <script src="{% static 'perfil.js' %}" defer></script>
+    <script src="{% static 'inventario.js' %}" defer></script>
 </body>
 </html>
