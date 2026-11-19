@@ -11,6 +11,7 @@
   let sesion = null;
   let renovacionPendiente = null;
   let origenCatalogo = null;
+  let origenPerfil = "session-panel";
 
   function aviso(id, texto, exito = false) {
     const elemento = $(id);
@@ -107,57 +108,103 @@
     $("session-panel").classList.remove("catalogo-sesion-activa");
     $("catalogo-en-sesion").classList.add("hidden");
     $("catalogo-abrir-sesion").classList.add("hidden");
-    $("mi-ficha").classList.add("hidden");
+    $("perfil-panel").classList.add("hidden");
+    $("pedidos-cliente-panel").hidden = true;
+    $("pedidos-produccion-panel").hidden = true;
+    $("inventario-repostero-panel").hidden = true;
+    $("session-panel").classList.remove("pedidos-sesion-ancha");
     const nombre = [usuario.first_name, usuario.last_name].filter(Boolean).join(" ");
     $("session-name").textContent = nombre || usuario.username;
     $("session-role").textContent = `Usuario: ${usuario.username} · Rol: ${usuario.rol?.nombre || "Sin rol"}`;
 
     const rol = usuario.rol?.codigo;
     const administrador = rol === "ADMIN" || usuario.is_superuser === true;
-    if (administrador || rol === "VENTAS") {
+    window.SIGEPPerfil?.iniciar({ usuario, request: peticionAutenticada, alActualizar: actualizarSesionPerfil });
+    if (administrador || rol === "VENTAS" || rol === "ALMACEN") {
       $("clientes-panel").classList.remove("hidden");
-      // El catálogo es visible para ADMIN y VENTAS; cuentas y roles solo para ADMIN.
+      $("clientes-usuario").textContent = `${usuario.first_name || usuario.username} · ${usuario.rol?.nombre || "Personal"}`;
       $("sigep-admin-tabs").hidden = false;
+      $("sigep-tab-clientes").hidden = rol === "ALMACEN";
       $("sigep-tab-usuarios").hidden = !administrador;
-      window.SIGEPClientes?.iniciar({ usuario, request: peticionAutenticada });
-      window.SIGEPProductos?.iniciar({ usuario, request: peticionAutenticada });
+      $("sigep-tab-productos").hidden = rol === "ALMACEN";
+      $("sigep-tab-pedidos").hidden = rol === "ALMACEN";
+      $("sigep-tab-inventario").hidden = !administrador && rol !== "ALMACEN";
+      if (administrador || rol === "VENTAS") {
+        window.SIGEPClientes?.iniciar({ usuario, request: peticionAutenticada });
+        window.SIGEPProductos?.iniciar({ usuario, request: peticionAutenticada });
+        window.SIGEPPedidos?.iniciar({ usuario, request: peticionAutenticada });
+      }
       if (administrador) window.SIGEPUsuarios?.iniciar({ usuario, request: peticionAutenticada });
-      cambiarVistaSIGEP("clientes");
+      if (administrador || rol === "ALMACEN") window.SIGEPInventario?.iniciar({ usuario, request: peticionAutenticada });
+      cambiarVistaSIGEP(rol === "ALMACEN" ? "inventario" : "clientes");
       return;
     }
 
     $("session-panel").classList.remove("hidden");
+    if (rol === "CLIENTE" || rol === "REPOSTERO") {
+      window.SIGEPPedidos?.iniciar({ usuario, request: peticionAutenticada });
+    }
+    if (rol === "REPOSTERO") window.SIGEPInventario?.iniciar({ usuario, request: peticionAutenticada });
     if (rol === "CLIENTE") {
       $("session-panel").classList.add("catalogo-sesion-activa");
       $("catalogo-en-sesion").classList.remove("hidden");
       window.SIGEPCatalogo?.mostrar("catalogo-en-sesion");
-      $("mi-ficha").classList.remove("hidden");
-      $("mi-ficha-contenido").textContent = "Consultando tu ficha...";
-      peticionAutenticada("/clientes/me/").then(ficha => {
-        $("mi-ficha-contenido").textContent =
-          `${ficha.nombre} ${ficha.apellidos}\nTeléfono: ${ficha.telefono || "Sin registrar"}\nCorreo: ${ficha.correo || "Sin registrar"}\nDirección: ${ficha.direccion || "Sin registrar"}`;
-      }).catch(error => { $("mi-ficha-contenido").textContent = error.message; });
     } else {
       $("catalogo-abrir-sesion").classList.remove("hidden");
     }
   }
 
+  function actualizarSesionPerfil(datos) {
+    if (!sesion?.usuario) return;
+    Object.assign(sesion.usuario, datos);
+    const nombre = [sesion.usuario.first_name, sesion.usuario.last_name].filter(Boolean).join(" ");
+    $("session-name").textContent = nombre || sesion.usuario.username;
+    $("session-role").textContent = `Usuario: ${sesion.usuario.username} · Rol: ${sesion.usuario.rol?.nombre || "Sin rol"}`;
+    $("clientes-usuario").textContent = `${sesion.usuario.first_name || sesion.usuario.username} · ${sesion.usuario.rol?.nombre || "Personal"}`;
+    // Refrescar datos del directorio si estaba abierto en administración.
+    if (sesion.usuario.rol?.codigo === "ADMIN") window.SIGEPClientes?.actualizar();
+  }
+
+  function abrirPerfil(origen) {
+    if (!sesion) return;
+    origenPerfil = origen;
+    for (const id of ["session-panel", "clientes-panel", "catalogo-visitante-panel", "auth-card"]) $(id).classList.add("hidden");
+    $("perfil-panel").classList.remove("hidden");
+    window.SIGEPPerfil?.mostrar();
+  }
+
+  function volverPerfil() {
+    $("perfil-panel").classList.add("hidden");
+    $(origenPerfil).classList.remove("hidden");
+    origenPerfil = "session-panel";
+  }
+
+  $("perfil-abrir-sesion").addEventListener("click", () => abrirPerfil("session-panel"));
+  $("perfil-abrir-personal").addEventListener("click", () => abrirPerfil("clientes-panel"));
+  $("perfil-volver").addEventListener("click", volverPerfil);
+
   function cambiarVistaSIGEP(vista) {
     $("sigep-vista-clientes").hidden = vista !== "clientes";
     $("sigep-vista-usuarios").hidden = vista !== "usuarios";
     $("sigep-vista-productos").hidden = vista !== "productos";
-    for (const nombre of ["clientes", "usuarios", "productos"]) {
+    $("sigep-vista-pedidos").hidden = vista !== "pedidos";
+    $("sigep-vista-inventario").hidden = vista !== "inventario";
+    for (const nombre of ["clientes", "usuarios", "productos", "pedidos", "inventario"]) {
       const boton = $(`sigep-tab-${nombre}`);
       boton.classList.toggle("sigep-tab-active", vista === nombre);
       boton.setAttribute("aria-selected", String(vista === nombre));
     }
     if (vista === "usuarios") window.SIGEPUsuarios?.actualizar();
     if (vista === "productos") window.SIGEPProductos?.actualizar();
+    if (vista === "pedidos") window.SIGEPPedidos?.actualizar();
+    if (vista === "inventario") window.SIGEPInventario?.actualizar();
   }
 
   $("sigep-tab-clientes").addEventListener("click", () => cambiarVistaSIGEP("clientes"));
   $("sigep-tab-usuarios").addEventListener("click", () => cambiarVistaSIGEP("usuarios"));
   $("sigep-tab-productos").addEventListener("click", () => cambiarVistaSIGEP("productos"));
+  $("sigep-tab-pedidos").addEventListener("click", () => cambiarVistaSIGEP("pedidos"));
+  $("sigep-tab-inventario").addEventListener("click", () => cambiarVistaSIGEP("inventario"));
 
   function abrirCatalogo(origen) {
     origenCatalogo = origen;
@@ -187,16 +234,19 @@
 
   function cerrarSesionLocal() {
     sesion = null;
+    window.SIGEPPerfil?.detener();
     window.SIGEPClientes?.detener();
     window.SIGEPUsuarios?.detener();
     window.SIGEPProductos?.detener();
+    window.SIGEPPedidos?.detener();
+    window.SIGEPInventario?.detener();
     window.SIGEPCatalogo?.cerrarDetalle();
     origenCatalogo = null;
     $("catalogo-visitante-panel").classList.add("hidden");
     $("session-panel").classList.remove("catalogo-sesion-activa");
     $("catalogo-en-sesion").classList.add("hidden");
     $("clientes-panel").classList.add("hidden");
-    $("mi-ficha").classList.add("hidden");
+    $("perfil-panel").classList.add("hidden");
     $("session-panel").classList.add("hidden");
     $("auth-card").classList.remove("hidden");
     $("login-password").value = "";

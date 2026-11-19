@@ -16,6 +16,8 @@ urlpatterns = [
     path("api/", include("usuarios.urls")),
     path("api/", include("clientes.urls")),
     path("api/", include("productos.urls")),
+    path("api/", include("pedidos.urls")),
+    path("api/", include("inventario.urls")),
 ]
 
 # Solo en desarrollo. En producción usar almacenamiento/servidor de medios dedicado.

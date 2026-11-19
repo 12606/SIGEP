@@ -3,7 +3,7 @@ from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APITestCase
 from .models import Rol
-
+from django.core.cache import cache
 Usuario = get_user_model()
 
 
@@ -143,6 +143,8 @@ class UsuariosAPITests(APITestCase):
 
 class RegistroPublicoTests(APITestCase):
     def setUp(self):
+        super().setUp()
+        cache.clear()
         self.cliente = Rol.objects.create(codigo="CLIENTE", nombre="Cliente", activo=True)
         Rol.objects.create(codigo="ADMIN", nombre="Administrador", activo=True)
         self.payload = {
