@@ -1,0 +1,27 @@
+/* Módulo de inventario; estilos aislados del resto de SIGEP. */
+.inventario-aviso{padding:12px 15px;border-radius:10px;margin:12px 0;font-size:13px}
+.inventario-aviso-error{background:#fff0f0;color:#a51b29;border:1px solid #ffd0d0}
+.inventario-aviso-ok{background:#eef9f0;color:#246e42;border:1px solid #bbebc5}
+.inventario-alerta{color:#b43a30;font-weight:800}
+.inventario-correcto{color:#2d7e53;font-weight:700}
+.inventario-inactivo,.inventario-muted{color:#97838a}
+.inventario-acciones{display:flex;align-items:center;gap:7px;flex-wrap:wrap}
+.inventario-separador{margin-top:24px}
+.inventario-repostero-item{display:flex;flex-direction:column;gap:4px;background:#fff;border:1px solid #f3e1e6;border-radius:14px;padding:13px;margin:8px 0;text-align:left}
+.inventario-repostero-item span{color:#755c62;font-size:13px}
+.inventario-repostero-item small{font-size:12px}
+.inventario-sesion-ancha{max-width:850px!important;width:min(100%,850px)!important}
+.inventario-dialog{border:0;border-radius:22px;padding:0;width:min(560px,95vw);max-height:90vh;overflow:auto;color:#593e3c;box-shadow:0 25px 80px #543c4450}
+.inventario-dialog::backdrop{background:rgba(26,14,22,.52)}
+.inventario-dialog form{padding:26px}
+.inventario-dialog-head{display:flex;align-items:center;justify-content:space-between;gap:14px;margin-bottom:17px}
+.inventario-dialog-head h2{font-size:23px;font-weight:900;color:#593e3c}
+.inventario-dialog-campos{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:15px}
+.inventario-dialog-campos label{font-size:12px;font-weight:800;color:#76595e}
+.inventario-dialog-campos input,.inventario-dialog-campos select,.inventario-dialog-campos textarea{display:block;width:100%;border:1px solid #eedce2;border-radius:10px;background:white;padding:11px 12px;font-size:14px;color:#593e3c;margin-top:6px}
+.inventario-dialog-campos [disabled]{background:#f7f1f3;color:#aa98a0}
+.inventario-dialog-campos .ancho{grid-column:span 2}
+.inventario-dialog-acciones{display:flex;justify-content:flex-end;margin-top:20px}
+.inventario-historial{margin-top:15px}
+#sigep-vista-inventario[hidden],#inventario-repostero-panel[hidden]{display:none!important}
+@media(max-width:620px){.inventario-dialog-campos{grid-template-columns:1fr}.inventario-dialog-campos .ancho{grid-column:auto}.inventario-dialog form{padding:17px}}

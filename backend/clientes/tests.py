@@ -1,12 +1,15 @@
+from unittest.mock import patch
+
 from django.contrib.auth import get_user_model
+from django.core.cache import cache
 from django.urls import reverse
 from rest_framework.test import APITestCase
-from django.core.cache import cache
+
 from .models import Cliente
 from usuarios.models import Rol
 
-Usuario = get_user_model()
 
+Usuario = get_user_model()
 
 class ClientesAPITests(APITestCase):
     def setUp(self):

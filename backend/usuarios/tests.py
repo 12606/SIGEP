@@ -143,6 +143,8 @@ class UsuariosAPITests(APITestCase):
 
 class RegistroPublicoTests(APITestCase):
     def setUp(self):
+        super().setUp()
+        cache.clear()
         self.cliente = Rol.objects.create(codigo="CLIENTE", nombre="Cliente", activo=True)
         Rol.objects.create(codigo="ADMIN", nombre="Administrador", activo=True)
         self.payload = {
