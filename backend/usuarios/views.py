@@ -12,7 +12,7 @@ from rest_framework.throttling import AnonRateThrottle
 
 from .models import Rol, Usuario
 from .permissions import EsAdministradorSIGEP
-from .serializers import EstadoUsuarioSerializer, RolSerializer, UsuarioEscrituraSerializer, UsuarioSerializer, RegistroPublicoSerializer
+from .serializers import EstadoUsuarioSerializer, RolSerializer, UsuarioEscrituraSerializer, UsuarioSerializer, RegistroPublicoSerializer, MiPerfilEdicionSerializer
 
 
 @api_view(["GET"])
@@ -24,8 +24,13 @@ def health(request):
     return Response({"status": "ok", "servicio": "SIGEP API", "base_de_datos": "conectada"})
 
 
-class MiPerfilView(generics.RetrieveAPIView):
-    serializer_class = UsuarioSerializer
+class MiPerfilView(generics.RetrieveUpdateAPIView):
+    """Perfil propio; PATCH jamás permite cambios de rol ni estado de cuenta."""
+    permission_classes = [permissions.IsAuthenticated]
+    http_method_names = ("get", "patch", "head", "options")
+
+    def get_serializer_class(self):
+        return MiPerfilEdicionSerializer if self.request.method == "PATCH" else UsuarioSerializer
 
     def get_object(self):
         return self.request.user

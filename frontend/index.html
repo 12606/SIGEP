@@ -84,6 +84,8 @@
     <link rel="stylesheet" href="{% static 'clientes.css' %}">
     <link rel="stylesheet" href="{% static 'productos.css' %}">
     <link rel="stylesheet" href="{% static 'catalogo.css' %}">
+    <link rel="stylesheet" href="{% static 'pedidos.css' %}">
+    <link rel="stylesheet" href="{% static 'perfil.css' %}">
 </head>
 <body class="bg-bakery-vanilla min-h-screen flex items-center justify-center p-4 selection:bg-bakery-pink selection:text-white relative overflow-x-hidden">
     
@@ -278,16 +280,58 @@
         <h2 class="font-cursive text-3xl text-bakery-brown mb-2">¡Bienvenido a Dulce Encanto!</h2>
         <p id="session-name" class="text-bakery-brown font-bold text-lg mb-1"></p>
         <p id="session-role" class="text-bakery-brownLight text-sm mb-5"></p>
-        <p class="text-gray-500 text-sm mb-6">La sesión con Django se ha iniciado correctamente. Los accesos a cada módulo dependen de tu rol.</p>
-        <div id="mi-ficha" class="hidden rounded-2xl bg-bakery-vanilla text-left p-5 mb-5">
-            <h3 class="font-bold text-bakery-brown mb-2">Mi ficha de cliente</h3>
-            <p id="mi-ficha-contenido" class="text-sm text-bakery-brownLight whitespace-pre-line"></p>
-        </div>
+        <p class="text-gray-500 text-sm mb-6">Explora los módulos disponibles para tu cuenta.</p>
+        <button id="perfil-abrir-sesion" type="button" class="sigep-button sigep-button-outline mb-5 w-full">Mi perfil · Ver y editar datos</button>
         <div id="catalogo-en-sesion" class="hidden" aria-label="Catálogo disponible para clientes"></div>
+        <!-- Fase 4: cliente, pedidos propios -->
+        <div id="pedidos-cliente-panel" class="pedidos-shell" hidden>
+          <div class="pedidos-barra"><h3>Mis pedidos</h3><div class="pedidos-botones">
+            <button id="pedidos-nuevo-cliente" type="button" class="sigep-button sigep-button-primary">+ Solicitar pedido</button>
+            <button id="pedidos-actualizar-cliente" type="button" class="sigep-button sigep-button-outline">Actualizar</button>
+          </div></div>
+          <p id="pedidos-cliente-aviso" role="status" hidden></p>
+          <div id="pedidos-cliente-lista" class="pedidos-lista"></div>
+        </div>
+        <!-- Fase 4: repostero, solo seguimiento de producción -->
+        <div id="pedidos-produccion-panel" class="pedidos-shell" hidden>
+          <div class="pedidos-barra"><h3>Producción de pedidos</h3>
+            <button id="pedidos-actualizar-produccion" type="button" class="sigep-button sigep-button-outline">Actualizar</button>
+          </div>
+          <p id="pedidos-produccion-aviso" role="status" hidden></p>
+          <div id="pedidos-produccion-lista" class="pedidos-lista"></div>
+        </div>
         <button id="catalogo-abrir-sesion" type="button" class="hidden catalogo-button catalogo-button-primary mb-4">Explorar catálogo de productos</button>
         <button id="logout-button" type="button" class="w-full bg-bakery-pink hover:bg-bakery-pinkHover text-white font-bold py-3 rounded-2xl transition-colors">Cerrar sesión</button>
     </section>
 
+
+    <!-- Perfil personal independiente: mismo formulario para clientes y personal. -->
+    <section id="perfil-panel" class="hidden sigep-perfil-shell relative z-10" aria-label="Mi perfil">
+      <div class="sigep-perfil-card">
+        <div class="sigep-perfil-top">
+          <div><span class="sigep-kicker">MI CUENTA</span><h2>Mi perfil</h2>
+            <p>Consulta y actualiza tus datos personales. Tu rol se gestiona por administración.</p></div>
+          <button id="perfil-volver" type="button" class="sigep-button sigep-button-outline">Volver</button>
+        </div>
+        <p id="perfil-feedback" role="status" class="sigep-feedback" hidden></p>
+        <form id="perfil-form">
+          <div class="sigep-perfil-campos">
+            <label>Nombre(s)<input id="perfil-nombre" maxlength="100" required autocomplete="given-name"></label>
+            <label>Apellidos<input id="perfil-apellidos" maxlength="150" required autocomplete="family-name"></label>
+            <label>Correo electrónico<input id="perfil-correo" type="email" maxlength="254" required autocomplete="email"></label>
+            <label>Teléfono<input id="perfil-telefono" type="tel" maxlength="20" autocomplete="tel" placeholder="10 a 15 dígitos"></label>
+            <label id="perfil-direccion-contenedor" class="sigep-perfil-ancho">Dirección<input id="perfil-direccion" maxlength="250" autocomplete="street-address"></label>
+          </div>
+          <div class="sigep-perfil-sololectura">
+            <p><strong>Usuario:</strong> <span id="perfil-usuario"></span></p>
+            <p><strong>Rol:</strong> <span id="perfil-rol"></span></p>
+          </div>
+          <div class="sigep-perfil-acciones">
+            <button type="submit" id="perfil-guardar" class="sigep-button sigep-button-primary">Guardar cambios</button>
+          </div>
+        </form>
+      </div>
+    </section>
 
     <!-- FASE 3: Vista del catálogo para visitantes y vista previa desde otras cuentas -->
     <section id="catalogo-visitante-panel" class="hidden catalogo-visitante-shell relative z-10" aria-label="Catálogo de Dulce Encanto">
@@ -311,6 +355,7 @@
             <span><strong>Dulce Encanto</strong><small>SIGEP · Panel de gestión</small></span>
           </div>
           <div class="sigep-header-right"><span id="clientes-usuario" class="sigep-user"></span>
+            <button id="perfil-abrir-personal" class="sigep-button sigep-button-outline" type="button">Mi perfil</button>
             <button id="catalogo-abrir-panel" class="sigep-button sigep-button-outline" type="button">Ver catálogo como cliente</button>
             <button id="clientes-logout-button" class="sigep-button sigep-button-outline" type="button">Cerrar sesión</button>
           </div>
@@ -320,6 +365,7 @@
             <button id="sigep-tab-clientes" type="button" class="sigep-tab sigep-tab-active" aria-selected="true">Clientes</button>
             <button id="sigep-tab-usuarios" type="button" class="sigep-tab" aria-selected="false">Usuarios y roles</button>
             <button id="sigep-tab-productos" type="button" class="sigep-tab" aria-selected="false">Productos</button>
+            <button id="sigep-tab-pedidos" type="button" class="sigep-tab" aria-selected="false">Pedidos y pagos</button>
           </nav>
           <div id="sigep-vista-clientes">
           <div class="sigep-kicker">ADMINISTRACIÓN / CLIENTES</div>
@@ -348,7 +394,7 @@
             <div id="clientes-feedback" class="sigep-feedback" role="status" aria-live="polite" hidden></div>
             <div class="sigep-table-scroll">
               <table class="sigep-table">
-                <thead><tr><th>Cliente</th><th>Contacto</th><th>Dirección</th><th>Cuenta web</th><th>Estado</th><th>Acciones</th></tr></thead>
+                <thead><tr><th>Cliente</th><th>Contacto</th><th>Dirección</th><th id="clientes-cuenta-col">Cuenta web</th><th>Estado</th><th>Acciones</th></tr></thead>
                 <tbody id="clientes-tbody"></tbody>
               </table>
             </div>
@@ -437,9 +483,76 @@
               <p id="categorias-vacio" class="sigep-empty" hidden>No hay categorías registradas.</p>
             </div>
           </div><!-- /sigep-vista-productos -->
+
+          <!-- Fase 4: gestión administrativa y ventas -->
+          <div id="sigep-vista-pedidos" hidden>
+            <div class="sigep-kicker">ADMINISTRACIÓN / PEDIDOS</div>
+            <div class="sigep-intro">
+              <div><h1>Pedidos y pagos</h1><p>Solicitudes, preparación, anticipos y entregas.</p></div>
+              <button id="pedidos-nuevo-admin" type="button" class="sigep-button sigep-button-primary">+ Nuevo pedido</button>
+            </div>
+            <div class="sigep-stats">
+              <div class="sigep-stat"><span>Pedidos encontrados</span><strong id="pedidos-numero">0</strong></div>
+              <div class="sigep-stat"><span>Sin confirmar</span><strong id="pedidos-pendientes">0</strong></div>
+              <div class="sigep-stat"><span>En proceso</span><strong id="pedidos-por-entregar">0</strong></div>
+            </div>
+            <div class="sigep-list-card">
+              <div class="sigep-list-top"><div><h2>Seguimiento de pedidos</h2><p>Consulta saldos y actualiza estados.</p></div>
+                <button id="pedidos-refrescar" type="button" class="sigep-button sigep-button-outline">Actualizar</button></div>
+              <div class="sigep-filters"><label class="sigep-filter-status">Estado
+                <select id="pedidos-filtro-estado"><option value="">Todos</option>
+                  <option value="PENDIENTE">Pendiente</option><option value="CONFIRMADO">Confirmado</option>
+                  <option value="EN_PREPARACION">En preparación</option><option value="LISTO">Listo</option>
+                  <option value="ENTREGADO">Entregado</option><option value="CANCELADO">Cancelado</option>
+                </select></label></div>
+              <p id="pedidos-admin-aviso" role="status" hidden></p>
+              <div class="sigep-table-scroll"><table class="sigep-table">
+                <thead><tr><th>Folio</th><th>Cliente</th><th>Entrega</th><th>Total</th><th>Saldo</th><th>Estado</th><th>Acción</th></tr></thead>
+                <tbody id="pedidos-tabla"></tbody></table></div>
+              <p id="pedidos-tabla-vacia" class="sigep-empty" hidden>No existen pedidos con ese estado.</p>
+            </div>
+          </div><!-- /sigep-vista-pedidos -->
         </div>
       </div>
     </section>
+
+    <!-- Fase 4: captura de pedido, precio final calculado por Django -->
+    <dialog id="pedido-dialog" class="pedidos-dialog" aria-labelledby="pedido-dialog-titulo">
+      <form id="pedido-nuevo-form">
+        <div class="pedidos-dialog-header"><h2 id="pedido-dialog-titulo">Nuevo pedido</h2><button id="pedido-cerrar" type="button" class="sigep-close" aria-label="Cerrar">×</button></div>
+        <p>Selecciona una fecha de entrega futura y agrega los productos.</p>
+        <div class="pedidos-form-campos">
+          <label id="pedido-cliente-grupo">Cliente *<select id="pedido-cliente"></select></label>
+          <label>Fecha y hora de entrega *<input id="pedido-fecha-entrega" type="datetime-local" required></label>
+          <label class="pedidos-span2">Observaciones<textarea id="pedido-observaciones" maxlength="1000" rows="2" placeholder="Indicaciones de entrega"></textarea></label>
+        </div>
+        <h3>Productos solicitados</h3>
+        <div id="pedido-lineas"></div>
+        <button id="pedido-anadir-producto" class="sigep-button sigep-button-outline" type="button">+ Agregar producto</button>
+        <p class="pedidos-total">Total: <span id="pedido-total-estimado">$0.00</span></p>
+        <p id="pedido-nuevo-aviso" role="alert" hidden></p>
+        <div class="pedidos-dialog-acciones"><button id="pedido-guardar" type="submit" class="sigep-button sigep-button-primary">Registrar pedido</button></div>
+      </form>
+    </dialog>
+
+    <dialog id="pedido-detalle-dialog" class="pedidos-dialog" aria-labelledby="pedido-detalle-folio">
+      <div class="pedidos-dialog-header"><h2 id="pedido-detalle-folio">Pedido</h2>
+        <button id="pedido-detalle-cerrar" type="button" class="sigep-close" aria-label="Cerrar">×</button></div>
+      <div id="pedido-detalle-contenido"></div>
+      <div id="pedido-estado-acciones" class="pedidos-estado-acciones"></div>
+      <form id="pedido-pago-form" hidden>
+        <h3>Registrar anticipo o pago</h3>
+        <div class="pedidos-pago-campos">
+          <label>Monto (MXN)<input id="pedido-pago-monto" type="number" min="0.01" step="0.01" required></label>
+          <label>Método<select id="pedido-pago-metodo" required>
+            <option value="EFECTIVO">Efectivo</option><option value="TRANSFERENCIA">Transferencia</option><option value="TARJETA">Tarjeta</option>
+          </select></label>
+          <label>Referencia<input id="pedido-pago-referencia" maxlength="120" placeholder="Opcional"></label>
+        </div>
+        <div class="pedidos-dialog-acciones"><button id="pedido-pago-guardar" class="sigep-button sigep-button-primary" type="submit">Registrar pago</button></div>
+      </form>
+      <p id="pedido-detalle-aviso" role="alert" hidden></p>
+    </dialog>
 
     <!-- Solo ADMIN: cambiar el rol de una cuenta existente. -->
     <dialog id="usuario-rol-dialog" class="sigep-dialog" aria-labelledby="usuario-rol-title">
@@ -575,5 +688,7 @@
     <script src="{% static 'usuarios.js' %}" defer></script>
     <script src="{% static 'productos.js' %}" defer></script>
     <script src="{% static 'catalogo.js' %}" defer></script>
+    <script src="{% static 'pedidos.js' %}" defer></script>
+    <script src="{% static 'perfil.js' %}" defer></script>
 </body>
 </html>

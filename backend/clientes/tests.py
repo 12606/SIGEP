@@ -1,7 +1,7 @@
 from django.contrib.auth import get_user_model
 from django.urls import reverse
 from rest_framework.test import APITestCase
-
+from django.core.cache import cache
 from .models import Cliente
 from usuarios.models import Rol
 
@@ -10,6 +10,8 @@ Usuario = get_user_model()
 
 class ClientesAPITests(APITestCase):
     def setUp(self):
+        super().setUp()
+        cache.clear()
         self.rol_admin = Rol.objects.create(codigo="ADMIN", nombre="Administrador")
         self.rol_ventas = Rol.objects.create(codigo="VENTAS", nombre="Ventas")
         self.rol_cliente = Rol.objects.create(codigo="CLIENTE", nombre="Cliente")

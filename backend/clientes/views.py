@@ -5,8 +5,8 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from .models import Cliente
-from .permissions import EsAdministradorOVentas
-from .serializers import ClienteSerializer, EstadoClienteSerializer
+from .permissions import EsAdministradorOVentas, EsAdministradorClientes, EsClientePropio, codigo_rol
+from .serializers import ClienteSerializer, EstadoClienteSerializer, MiFichaClienteSerializer
 
 
 class ClientesView(generics.ListCreateAPIView):
@@ -17,6 +17,9 @@ class ClientesView(generics.ListCreateAPIView):
 
     def get_queryset(self):
         queryset = super().get_queryset()
+        if codigo_rol(self.request.user) == "VENTAS":
+            # No mostrar perfiles de empleados en el directorio comercial.
+            queryset = queryset.filter(Q(usuario__isnull=True) | Q(usuario__rol__codigo="CLIENTE"))
         buscar = self.request.query_params.get("buscar", "").strip()
         activo = self.request.query_params.get("activo")
         if buscar:
@@ -39,9 +42,15 @@ class ClienteDetalleView(generics.RetrieveUpdateAPIView):
     queryset = Cliente.objects.select_related("usuario__rol").all()
     http_method_names = ("get", "patch", "head", "options")
 
+    def get_queryset(self):
+        qs = super().get_queryset()
+        if codigo_rol(self.request.user) == "VENTAS":
+            return qs.filter(Q(usuario__isnull=True) | Q(usuario__rol__codigo="CLIENTE"))
+        return qs
+
 
 class EstadoClienteView(APIView):
-    permission_classes = [EsAdministradorOVentas]
+    permission_classes = [EsAdministradorClientes]
 
     def patch(self, request, pk):
         cliente = get_object_or_404(Cliente, pk=pk)
@@ -52,10 +61,11 @@ class EstadoClienteView(APIView):
         return Response(ClienteSerializer(cliente).data)
 
 
-class MiFichaClienteView(generics.RetrieveAPIView):
-    """El cliente ve solo su propia ficha vinculada a su cuenta web."""
-    permission_classes = [permissions.IsAuthenticated]
-    serializer_class = ClienteSerializer
+class MiFichaClienteView(generics.RetrieveUpdateAPIView):
+    """Un CLIENTE puede ver y editar solo su ficha, no sus privilegios."""
+    permission_classes = [EsClientePropio]
+    serializer_class = MiFichaClienteSerializer
+    http_method_names = ("get", "patch", "head", "options")
 
     def get_object(self):
         return get_object_or_404(Cliente, usuario=self.request.user, activo=True)
