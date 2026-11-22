@@ -129,7 +129,7 @@
       const p=productos.find(p=>String(p.id)===select.value);
       total+= (p?Number(p.precio_base):0) * (Number(cant.value)||0);
     }
-    $('pedido-total-estimado').textContent=money(total)+' (estimado; la API confirma el precio)';
+    $('pedido-total-estimado').textContent=money(total)+' (estimado;)';
   }
 
   async function guardarNuevo(ev) {
