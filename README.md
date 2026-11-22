@@ -63,7 +63,6 @@ SIGEP/
 │   ├── manage.py
 │   ├── requirements.txt
 │   ├── .env.example
-│   └── compose.yaml         # MariaDB opcional mediante Docker
 ├── frontend/                # Interfaz y archivos estáticos
 ├── docs/                    # Guías y manuales (si la fase 7 está integrada)
 ├── tools/                   # Validación y respaldos (fase 7)
