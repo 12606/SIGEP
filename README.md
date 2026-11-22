@@ -4,7 +4,7 @@
 
 El proyecto está desarrollado con **Django REST Framework, MariaDB, HTML, CSS y JavaScript**, e incluye autenticación JWT y permisos según el rol del usuario. Está pensado como un proyecto académico y una base ampliable para un sistema de gestión real.
 
-> **Estado:** versión funcional para pruebas locales. No se entrega una base de datos con información de clientes ni credenciales predeterminadas. Antes de publicarlo en Internet, revisa las recomendaciones de [seguridad y despliegue](#seguridad-y-despliegue).
+
 
 ## Contenido
 
