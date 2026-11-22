@@ -195,12 +195,14 @@
       $("sigep-tab-productos").hidden = rol === "ALMACEN";
       $("sigep-tab-pedidos").hidden = rol === "ALMACEN";
       $("sigep-tab-inventario").hidden = !administrador && rol !== "ALMACEN";
+      $("sigep-tab-reportes").hidden = !administrador;
       if (administrador || rol === "VENTAS") {
         window.SIGEPClientes?.iniciar({ usuario, request: peticionAutenticada });
         window.SIGEPProductos?.iniciar({ usuario, request: peticionAutenticada });
         window.SIGEPPedidos?.iniciar({ usuario, request: peticionAutenticada });
       }
       if (administrador) window.SIGEPUsuarios?.iniciar({ usuario, request: peticionAutenticada });
+      if (administrador) window.SIGEPReportes?.iniciar({ usuario, request: peticionAutenticada });
       if (administrador || rol === "ALMACEN") window.SIGEPInventario?.iniciar({ usuario, request: peticionAutenticada });
       cambiarVistaSIGEP(rol === "ALMACEN" ? "inventario" : "clientes");
       return;
@@ -255,7 +257,8 @@
     $("sigep-vista-productos").hidden = vista !== "productos";
     $("sigep-vista-pedidos").hidden = vista !== "pedidos";
     $("sigep-vista-inventario").hidden = vista !== "inventario";
-    for (const nombre of ["clientes", "usuarios", "productos", "pedidos", "inventario"]) {
+    $("sigep-vista-reportes").hidden = vista !== "reportes";
+    for (const nombre of ["clientes", "usuarios", "productos", "pedidos", "inventario", "reportes"]) {
       const boton = $(`sigep-tab-${nombre}`);
       boton.classList.toggle("sigep-tab-active", vista === nombre);
       boton.setAttribute("aria-selected", String(vista === nombre));
@@ -264,6 +267,7 @@
     if (vista === "productos") window.SIGEPProductos?.actualizar();
     if (vista === "pedidos") window.SIGEPPedidos?.actualizar();
     if (vista === "inventario") window.SIGEPInventario?.actualizar();
+    if (vista === "reportes") window.SIGEPReportes?.actualizar();
   }
 
   $("sigep-tab-clientes").addEventListener("click", () => cambiarVistaSIGEP("clientes"));
@@ -271,6 +275,7 @@
   $("sigep-tab-productos").addEventListener("click", () => cambiarVistaSIGEP("productos"));
   $("sigep-tab-pedidos").addEventListener("click", () => cambiarVistaSIGEP("pedidos"));
   $("sigep-tab-inventario").addEventListener("click", () => cambiarVistaSIGEP("inventario"));
+  $("sigep-tab-reportes").addEventListener("click", () => cambiarVistaSIGEP("reportes"));
 
   function abrirCatalogo(origen) {
     origenCatalogo = origen;
@@ -309,6 +314,7 @@
     window.SIGEPProductos?.detener();
     window.SIGEPPedidos?.detener();
     window.SIGEPInventario?.detener();
+    window.SIGEPReportes?.detener();
     window.SIGEPCatalogo?.cerrarDetalle();
     origenCatalogo = null;
     $("catalogo-visitante-panel").classList.add("hidden");
