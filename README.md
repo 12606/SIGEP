@@ -329,24 +329,8 @@ Las rutas protegidas requieren un JWT válido y los permisos correspondientes. E
 
 Si ves una base vacía de repente, **no elimines tablas ni vuelvas a crear usuarios**. Primero ejecuta el comando de comprobación de conexión del paso 5 y confirma que Django usa MariaDB en lugar de la base SQLite de pruebas.
 
-## Seguridad y despliegue
 
-SIGEP se proporciona para **pruebas locales y evaluación académica**. Antes de publicarlo en un servidor accesible por Internet se requiere, como mínimo:
 
-- Configurar `DJANGO_DEBUG=False`, un `DJANGO_SECRET_KEY` privado y hosts permitidos.
-- Habilitar HTTPS, cookies seguras, un proxy correctamente configurado y revisar `python manage.py check --deploy`.
-- Compilar Tailwind CSS para producción en lugar de depender del CDN de desarrollo.
-- Revisar el almacenamiento de refresh tokens (preferir cookies `HttpOnly`, `Secure`, `SameSite` y protección CSRF), así como los permisos y la gestión de secretos.
-- Configurar respaldos de MariaDB y de los archivos subidos, además de probar su restauración.
-- Utilizar un servidor de aplicaciones y servir archivos estáticos y medios de manera apropiada; **no usar `runserver` en producción**.
-
-Las guías de la fase 7, cuando están disponibles en tu rama, amplían estos temas:
-
-- [`docs/13_MANUAL_USUARIO_SIGEP.md`](docs/13_MANUAL_USUARIO_SIGEP.md)
-- [`docs/14_MANUAL_TECNICO_SIGEP.md`](docs/14_MANUAL_TECNICO_SIGEP.md)
-- [`docs/16_RESPALDOS_Y_RESTAURACION.md`](docs/16_RESPALDOS_Y_RESTAURACION.md)
-- [`docs/17_DESPLIEGUE_SIGEP.md`](docs/17_DESPLIEGUE_SIGEP.md)
-- [`docs/19_CHECKLIST_ENTREGA.md`](docs/19_CHECKLIST_ENTREGA.md)
 
 ---
 
