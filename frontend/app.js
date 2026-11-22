@@ -1,16 +1,76 @@
-/* SIGEP · Dulce Encanto. Integración inicial con Django REST Framework.
-   Los tokens JWT permanecen solo en memoria y se pierden al recargar la pestaña.
-   Para producción: autenticación con cookies HttpOnly, HTTPS y protección CSRF. */
+/* SIGEP · Dulce Encanto. Autenticación JWT con restauración por pestaña.
+   sessionStorage conserva los tokens al recargar, pero no al cerrar la pestaña.
+   En producción conviene reemplazarlo por refresh token en cookie HttpOnly,
+   HTTPS y protección CSRF. Nunca guardes contraseñas en el navegador. */
 (() => {
   "use strict";
 
   // La web se abre desde Django en http://127.0.0.1:8000/.
   // Usar ruta relativa evita errores CORS o puertos inconsistentes.
   const API_BASE = "/api";
+  const CLAVE_TOKENS = "sigep.jwt.session.v1";
   const $ = (id) => document.getElementById(id);
   let sesion = null;
   let renovacionPendiente = null;
+  let temporizadorRenovacion = null;
   let origenCatalogo = null;
+
+  // Solo persiste los JWT; nombres y permisos siempre se consultan en Django.
+  function guardarTokens() {
+    if (!sesion?.access || !sesion?.refresh) return;
+    try {
+      sessionStorage.setItem(CLAVE_TOKENS, JSON.stringify({
+        access: sesion.access, refresh: sesion.refresh
+      }));
+    } catch (error) {
+      console.warn("El navegador no permite conservar la sesión:", error);
+    }
+  }
+
+  function leerTokens() {
+    try {
+      const guardados = sessionStorage.getItem(CLAVE_TOKENS);
+      if (!guardados) return null;
+      const tokens = JSON.parse(guardados);
+      if (typeof tokens?.access === "string" && tokens.access &&
+          typeof tokens?.refresh === "string" && tokens.refresh) {
+        return { access: tokens.access, refresh: tokens.refresh };
+      }
+    } catch (error) {
+      console.warn("No se pudo leer la sesión guardada:", error);
+    }
+    borrarTokens();
+    return null;
+  }
+
+  function borrarTokens() {
+    try { sessionStorage.removeItem(CLAVE_TOKENS); } catch { /* Almacenamiento no disponible. */ }
+  }
+
+  // Solo se usa la fecha de vencimiento del JWT para PROGRAMAR su renovación.
+  // La autorización real siempre la valida Django en cada petición.
+  function vencimientoAccess(access) {
+    try {
+      const parte = access.split(".")[1];
+      if (!parte) return null;
+      const base64 = parte.replace(/-/g, "+").replace(/_/g, "/");
+      const exp = JSON.parse(atob(base64)).exp;
+      return Number.isFinite(exp) ? exp * 1000 : null;
+    } catch { return null; }
+  }
+
+  function programarRenovacion() {
+    if (temporizadorRenovacion !== null) clearTimeout(temporizadorRenovacion);
+    temporizadorRenovacion = null;
+    if (!sesion?.access || !sesion?.refresh) return;
+    const vence = vencimientoAccess(sesion.access);
+    if (vence === null) return; // Si no se puede leer, el HTTP 401 activa el refresh.
+    const demora = Math.max(1000, Math.min(vence - Date.now() - 60_000, 2_147_000_000));
+    temporizadorRenovacion = setTimeout(() => {
+      temporizadorRenovacion = null;
+      renovarSesion().catch(error => console.warn("Renovación JWT:", error.message));
+    }, demora);
+  }
   let origenPerfil = "session-panel";
 
   function aviso(id, texto, exito = false) {
@@ -70,7 +130,9 @@
           partes.push(["detail", "non_field_errors"].includes(campo) ? txt : `${campo}: ${txt}`);
         }
       }
-      throw new Error(partes.join(" · ") || `La solicitud falló (HTTP ${response.status}).`);
+      const error = new Error(partes.join(" · ") || `La solicitud falló (HTTP ${response.status}).`);
+      error.status = response.status;
+      throw error;
     }
     return payload;
   }
@@ -79,17 +141,21 @@
     if (!sesion?.refresh) throw new Error("Inicia sesión nuevamente.");
     if (!renovacionPendiente) {
       renovacionPendiente = (async () => {
-        const refreshAnterior = sesion.refresh;
+        const sesionOriginal = sesion;
+        const refreshAnterior = sesionOriginal.refresh;
         const nuevos = await peticion("/auth/refresh/", "POST", { refresh: refreshAnterior }, null, false);
         if (!nuevos?.access) throw new Error("No fue posible renovar la sesión.");
-        // SIMPLE_JWT rota refresh tokens; conservar siempre el más reciente.
-        if (sesion) {
-          sesion.access = nuevos.access;
-          sesion.refresh = nuevos.refresh || refreshAnterior;
-        }
+        // Si el usuario cerró sesión mientras llegaba la respuesta, no la restauramos.
+        if (sesion !== sesionOriginal) return;
+        sesion.access = nuevos.access;
+        sesion.refresh = nuevos.refresh || refreshAnterior;
+        // Con ROTATE_REFRESH_TOKENS el anterior se invalida: guardar el nuevo.
+        guardarTokens();
+        programarRenovacion();
       })().catch((error) => {
-        cerrarSesionLocal();
-        throw new Error(`Tu sesión expiró. Inicia sesión nuevamente. ${error.message}`);
+        // Un problema de red no debe destruir la sesión guardada.
+        if ([400, 401, 403].includes(error.status)) cerrarSesionLocal();
+        throw error;
       }).finally(() => { renovacionPendiente = null; });
     }
     return renovacionPendiente;
@@ -234,6 +300,9 @@
 
   function cerrarSesionLocal() {
     sesion = null;
+    borrarTokens();
+    if (temporizadorRenovacion !== null) clearTimeout(temporizadorRenovacion);
+    temporizadorRenovacion = null;
     window.SIGEPPerfil?.detener();
     window.SIGEPClientes?.detener();
     window.SIGEPUsuarios?.detener();
@@ -265,6 +334,8 @@
       if (!tokens?.access || !tokens?.refresh) throw new Error("La API no devolvió los tokens esperados.");
       const perfil = await peticion("/usuarios/me/", "GET", null, tokens.access);
       sesion = { access: tokens.access, refresh: tokens.refresh, usuario: perfil };
+      guardarTokens();
+      programarRenovacion();
       $("login-password").value = "";
       mostrarSesion(perfil);
     } catch (error) {
@@ -311,12 +382,17 @@
 
   async function cerrarSesion(boton) {
     if (!sesion) return cerrarSesionLocal();
-    const { access, refresh } = sesion;
     boton.disabled = true;
     try {
-      await peticion("/auth/logout/", "POST", { refresh }, access);
+      // Si el access expiró, se renueva ANTES del logout para revocar
+      // el refresh más reciente (con ROTATE_REFRESH_TOKENS activado).
+      const vence = vencimientoAccess(sesion.access);
+      if (vence !== null && vence <= Date.now()) await renovarSesion();
+      if (sesion) {
+        const { access, refresh } = sesion;
+        await peticion("/auth/logout/", "POST", { refresh }, access, false);
+      }
     } catch (error) {
-      // Los tokens guardados solo en memoria se descartan incluso si la red falla.
       console.warn("No fue posible revocar el refresh token:", error.message);
     } finally {
       boton.disabled = false;
@@ -331,4 +407,33 @@
     event.preventDefault();
     aviso("login-message", "La recuperación de contraseña todavía no está implementada. Contacta al administrador.");
   });
+
+  // Recuperar la sesión al refrescar F5 o Ctrl+F5. No confiar en datos de rol guardados.
+  async function restaurarSesion() {
+    const tokens = leerTokens();
+    if (!tokens) return;
+    $("auth-card").classList.add("hidden");
+    sesion = { ...tokens, usuario: null };
+    try {
+      // Si el access venció, peticion() renueva JWT automáticamente al recibir 401.
+      const perfil = await peticionAutenticada("/usuarios/me/");
+      if (!sesion) return; // Puede haberse invalidado la sesión durante el refresh.
+      sesion.usuario = perfil;
+      guardarTokens();
+      programarRenovacion();
+      mostrarSesion(perfil);
+    } catch (error) {
+      if ([400, 401, 403].includes(error.status) || !sesion) {
+        cerrarSesionLocal();
+        aviso("login-message", "La sesión expiró o fue revocada. Inicia sesión nuevamente.");
+      } else {
+        // Mantener tokens si se cortó Internet; el usuario puede recargar y reintentar.
+        sesion = null;
+        $("auth-card").classList.remove("hidden");
+        aviso("login-message", "No se pudo verificar la sesión. Revisa la conexión y recarga la página.");
+      }
+    }
+  }
+
+  void restaurarSesion();
 })();
