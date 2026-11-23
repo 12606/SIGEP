@@ -1,0 +1,45 @@
+<div id="sigep-vista-productos" hidden>
+            <div class="sigep-kicker">ADMINISTRACIÓN / CATÁLOGO</div>
+            <div class="sigep-intro">
+              <div><h1>Productos y categorías</h1><p>Gestiona el catálogo de pasteles, postres, precios e imágenes.</p></div>
+              <button id="productos-nuevo" type="button" class="sigep-button sigep-button-primary">+ Nuevo producto</button>
+            </div>
+            <div class="sigep-stats" aria-label="Resumen del catálogo">
+              <div class="sigep-stat"><span>Productos encontrados</span><strong id="productos-total">0</strong><small>En el filtro actual</small></div>
+              <div class="sigep-stat"><span>Activos</span><strong id="productos-activos">0</strong><small>En el filtro actual</small></div>
+              <div class="sigep-stat"><span>Categorías</span><strong id="productos-categorias-total">0</strong><small>Registradas</small></div>
+            </div>
+            <div class="sigep-list-card">
+              <div class="sigep-list-top"><div><h2>Catálogo de productos</h2><p>Listado y administración de precios</p></div>
+                <button id="productos-refrescar" class="sigep-button sigep-button-outline" type="button">Actualizar</button>
+              </div>
+              <div class="sigep-filtros-productos">
+                <label>Buscar producto<input id="productos-buscar" type="search" placeholder="Nombre, categoría o descripción"></label>
+                <label>Categoría<select id="productos-filtro-categoria"><option value="">Todas</option></select></label>
+                <label>Estado<select id="productos-filtro-estado"><option value="">Todos</option><option value="true">Activos</option><option value="false">Inactivos</option></select></label>
+              </div>
+              <p id="productos-feedback" class="sigep-feedback" role="status" aria-live="polite" hidden></p>
+              <div class="sigep-table-scroll">
+                <table class="sigep-table">
+                  <thead><tr><th>Producto</th><th>Categoría</th><th>Precio</th><th>Unidad</th><th>Estado</th><th>Acciones</th></tr></thead>
+                  <tbody id="productos-tbody"></tbody>
+                </table>
+              </div>
+              <p id="productos-vacio" class="sigep-empty" hidden>No hay productos para este filtro.</p>
+              <div class="sigep-list-foot">Desactivar un producto lo oculta del catálogo de los demás roles; no se elimina de MariaDB.</div>
+            </div>
+
+            <div class="sigep-list-card sigep-categorias-bloque">
+              <div class="sigep-list-top"><div><h2>Categorías del catálogo</h2><p>Pasteles, cupcakes, galletas y otras familias</p></div>
+                <button id="categorias-nueva" type="button" class="sigep-button sigep-button-primary">+ Nueva categoría</button>
+              </div>
+              <p id="categorias-feedback" class="sigep-feedback" role="status" aria-live="polite" hidden></p>
+              <div class="sigep-table-scroll">
+                <table class="sigep-table">
+                  <thead><tr><th>Categoría</th><th>Descripción</th><th>Estado</th><th>Acciones</th></tr></thead>
+                  <tbody id="categorias-tbody"></tbody>
+                </table>
+              </div>
+              <p id="categorias-vacio" class="sigep-empty" hidden>No hay categorías registradas.</p>
+            </div>
+          </div>

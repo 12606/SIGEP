@@ -1,0 +1,20 @@
+<dialog id="cliente-dialog" class="sigep-dialog" aria-labelledby="cliente-dialog-title">
+      <form id="cliente-form" novalidate>
+        <div class="sigep-dialog-top"><div><span class="sigep-kicker">SIGEP · CLIENTES</span><h2 id="cliente-dialog-title">Registrar cliente</h2></div>
+          <button id="cliente-cerrar" type="button" class="sigep-close" aria-label="Cerrar formulario">×</button></div>
+        <p class="sigep-dialog-description">Los campos marcados con * son obligatorios.</p>
+        <div class="sigep-form-grid">
+          <label>Nombre *<input id="cliente-nombre" name="nombre" required maxlength="100" autocomplete="given-name"/></label>
+          <label>Apellidos *<input id="cliente-apellidos" name="apellidos" required maxlength="150" autocomplete="family-name"/></label>
+          <label>Teléfono<input id="cliente-telefono" name="telefono" maxlength="20" inputmode="tel" autocomplete="tel"/></label>
+          <label>Correo<input id="cliente-correo" name="correo" type="email" maxlength="254" autocomplete="email"/></label>
+          <label class="sigep-span2">Dirección<input id="cliente-direccion" name="direccion" maxlength="250" autocomplete="street-address"/></label>
+          <label class="sigep-span2">Observaciones<textarea id="cliente-observaciones" name="observaciones" rows="3" placeholder="Preferencias, indicaciones, notas de contacto..."></textarea></label>
+        </div>
+        <p id="cliente-form-error" class="sigep-form-error" role="alert" hidden></p>
+        <div class="sigep-dialog-actions">
+          <button id="cliente-cancelar" type="button" class="sigep-button sigep-button-outline">Cancelar</button>
+          <button id="cliente-guardar" type="submit" class="sigep-button sigep-button-primary">Guardar cliente</button>
+        </div>
+      </form>
+    </dialog>

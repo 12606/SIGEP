@@ -1,0 +1,17 @@
+<dialog id="inventario-movimiento-dialog" class="inventario-dialog" aria-labelledby="inventario-movimiento-titulo">
+      <form id="inventario-movimiento-form">
+        <div class="inventario-dialog-head"><h2 id="inventario-movimiento-titulo">Nuevo movimiento</h2>
+          <button id="inventario-movimiento-cerrar" class="sigep-close" type="button" aria-label="Cerrar">×</button></div>
+        <p id="inventario-movimiento-nombre" class="inventario-muted"></p>
+        <input type="hidden" id="inventario-movimiento-id">
+        <div class="inventario-dialog-campos">
+          <label>Tipo *<select id="inventario-movimiento-tipo" required>
+            <option value="ENTRADA">Entrada</option><option value="SALIDA">Salida</option><option value="MERMA">Merma</option>
+          </select></label>
+          <label>Cantidad (unidad base) *<input id="inventario-movimiento-cantidad" type="number" min="0.001" step="0.001" required></label>
+          <label class="ancho">Motivo *<textarea id="inventario-movimiento-motivo" maxlength="250" rows="2" required placeholder="Compra de insumos, consumo, producto dañado…"></textarea></label>
+        </div>
+        <p id="inventario-movimiento-aviso" role="status" hidden></p>
+        <div class="inventario-dialog-acciones"><button id="inventario-movimiento-guardar" class="sigep-button sigep-button-primary" type="submit">Registrar movimiento</button></div>
+      </form>
+    </dialog>

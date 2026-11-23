@@ -1,0 +1,179 @@
+<main id="auth-card" class="w-full max-w-md bg-white rounded-[2.5rem] shadow-[0_20px_50px_-12px_rgba(255,148,183,0.3)] relative z-10 animate-fade-in-up overflow-hidden">
+        
+        <!-- Contenedor Flex para el Deslizamiento -->
+        <div id="form-slider" class="flex w-[200%] transition-transform duration-500 ease-in-out transform translate-x-0">
+            
+            <!-- ===================== -->
+            <!-- FORMULARIO DE LOGIN   -->
+            <!-- ===================== -->
+            <div class="w-1/2 p-8 sm:p-10 flex flex-col justify-center">
+                <!-- Icono de Cupcake y Título -->
+                <div class="text-center mb-8">
+                    <div class="inline-flex items-center justify-center w-16 h-16 bg-bakery-cream rounded-full mb-4 shadow-inner">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-8 h-8 text-bakery-pink">
+                            <path d="M12 2C10.5 2 9 3 9 4.5C9 5 9.2 5.5 9.5 5.8C8 6.5 7 8 7 9.5C7 10.3 7.3 11 7.7 11.5C6.7 12.2 6 13.5 6 15H18C18 13.5 17.3 12.2 16.3 11.5C16.7 11 17 10.3 17 9.5C17 8 16 6.5 14.5 5.8C14.8 5.5 15 5 15 4.5C15 3 13.5 2 12 2Z" />
+                            <path d="M6 16L7 22H17L18 16H6Z" opacity="0.6"/>
+                        </svg>
+                    </div>
+                    <h1 class="font-cursive text-3xl text-bakery-brown mb-1">Dulce Encanto</h1>
+                    <p class="text-bakery-brownLight text-xs font-semibold tracking-wide uppercase">Bienvenido de vuelta</p>
+                </div>
+
+                <!-- Formulario -->
+                <form id="login-form" class="space-y-5">
+                    
+                    <!-- Correo registrado o usuario de Django -->
+                    <div class="relative group">
+                        <input type="text" id="login-email" name="username" autocomplete="username" class="peer w-full px-5 py-4 border-2 border-gray-100 rounded-2xl text-bakery-brown font-medium bg-transparent outline-none transition-all duration-300 focus:border-bakery-pink focus:bg-white hover:border-pink-100" placeholder=" " required />
+                        <label for="login-email" class="absolute left-4 top-4 text-gray-400 bg-white px-1 pointer-events-none transition-all duration-300 ease-in-out peer-placeholder-shown:top-4 peer-placeholder-shown:text-base peer-focus:-top-3 peer-focus:text-sm peer-focus:text-bakery-pink peer-focus:font-bold peer-[:not(:placeholder-shown)]:-top-3 peer-[:not(:placeholder-shown)]:text-sm peer-[:not(:placeholder-shown)]:text-bakery-pink">
+                            Correo electrónico o usuario
+                        </label>
+                    </div>
+
+                    <!-- Campo Contraseña -->
+                    <div class="relative">
+                        <input type="password" id="login-password" name="password" autocomplete="current-password" class="peer w-full px-5 py-4 border-2 border-gray-100 rounded-2xl text-bakery-brown font-medium bg-transparent outline-none transition-all duration-300 focus:border-bakery-pink focus:bg-white hover:border-pink-100 pr-12" placeholder=" " required />
+                        <label for="login-password" class="absolute left-4 top-4 text-gray-400 bg-white px-1 pointer-events-none transition-all duration-300 ease-in-out peer-placeholder-shown:top-4 peer-placeholder-shown:text-base peer-focus:-top-3 peer-focus:text-sm peer-focus:text-bakery-pink peer-focus:font-bold peer-[:not(:placeholder-shown)]:-top-3 peer-[:not(:placeholder-shown)]:text-sm peer-[:not(:placeholder-shown)]:text-bakery-pink">
+                            Contraseña
+                        </label>
+                        <!-- Botón mostrar/ocultar contraseña -->
+                        <button type="button" onclick="togglePassword('login-password', 'login-eye-icon')" class="absolute right-4 top-4 text-gray-400 hover:text-bakery-pink transition-colors focus:outline-none">
+                            <svg id="login-eye-icon" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                            </svg>
+                        </button>
+                    </div>
+
+                    <div class="flex justify-end">
+                        <a href="#" id="forgot-password" class="text-sm text-bakery-brownLight hover:text-bakery-pink font-semibold transition-colors duration-200">
+                            ¿Olvidaste tu contraseña?
+                        </a>
+                    </div>
+
+                    <p id="login-message" role="status" aria-live="polite" class="hidden text-sm rounded-xl px-4 py-3"></p>
+                    <button id="login-submit" type="submit" class="w-full bg-bakery-pink hover:bg-bakery-pinkHover text-white font-bold py-4 rounded-2xl shadow-lg shadow-pink-200 transform transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-pink-300 active:scale-95 flex items-center justify-center gap-2">
+                        Iniciar sesión
+                    </button>
+                </form>
+
+                <!-- Ir a Registro -->
+                <div class="mt-6 text-center">
+                    <p class="text-gray-500 text-sm">
+                        ¿Aún no tienes una cuenta? 
+                        <a href="#" onclick="showRegister(event)" class="text-bakery-pink font-bold hover:text-bakery-pinkHover hover:underline underline-offset-4 transition-colors">
+                            Regístrate aquí
+                        </a>
+                    </p>
+                </div>
+            </div>
+
+            <!-- ===================== -->
+            <!-- FORMULARIO REGISTRO   -->
+            <!-- ===================== -->
+            <div class="w-1/2 p-8 sm:p-10 flex flex-col justify-center">
+                <!-- Icono y Título -->
+                <div class="text-center mb-6">
+                    <h2 class="font-cursive text-3xl text-bakery-brown mb-1">Únete a la familia</h2>
+                    <p class="text-bakery-brownLight text-xs font-semibold tracking-wide uppercase">Crea tu cuenta dulce</p>
+                </div>
+
+                <!-- Formulario -->
+                <form id="register-form" class="space-y-4">
+                    
+                    <!-- Campo Nombre -->
+                    <div class="relative group">
+                        <input type="text" id="register-name" name="first_name" autocomplete="given-name" maxlength="150" class="peer w-full px-5 py-3.5 border-2 border-gray-100 rounded-2xl text-bakery-brown font-medium bg-transparent outline-none transition-all duration-300 focus:border-bakery-pink focus:bg-white hover:border-pink-100" placeholder=" " required />
+                        <label for="register-name" class="absolute left-4 top-3.5 text-gray-400 bg-white px-1 pointer-events-none transition-all duration-300 ease-in-out peer-placeholder-shown:top-3.5 peer-placeholder-shown:text-base peer-focus:-top-3 peer-focus:text-sm peer-focus:text-bakery-pink peer-focus:font-bold peer-[:not(:placeholder-shown)]:-top-3 peer-[:not(:placeholder-shown)]:text-sm peer-[:not(:placeholder-shown)]:text-bakery-pink">
+                            Nombre(s)
+                        </label>
+                    </div>
+
+                    <!-- Apellidos -->
+                    <div class="relative group">
+                        <input type="text" id="register-lastname" name="last_name" autocomplete="family-name" maxlength="150" class="peer w-full px-5 py-3.5 border-2 border-gray-100 rounded-2xl text-bakery-brown font-medium bg-transparent outline-none transition-all duration-300 focus:border-bakery-pink focus:bg-white hover:border-pink-100" placeholder=" " required />
+                        <label for="register-lastname" class="absolute left-4 top-3.5 text-gray-400 bg-white px-1 pointer-events-none transition-all duration-300 ease-in-out peer-placeholder-shown:top-3.5 peer-placeholder-shown:text-base peer-focus:-top-3 peer-focus:text-sm peer-focus:text-bakery-pink peer-focus:font-bold peer-[:not(:placeholder-shown)]:-top-3 peer-[:not(:placeholder-shown)]:text-sm peer-[:not(:placeholder-shown)]:text-bakery-pink">
+                            Apellidos
+                        </label>
+                    </div>
+
+                    <!-- Nombre de usuario -->
+                    <div class="relative group">
+                        <input type="text" id="register-username" name="username" autocomplete="username" minlength="3" maxlength="150" pattern="[A-Za-z0-9@.+_-]+" title="Letras, números y los signos @ . + - _" class="peer w-full px-5 py-3.5 border-2 border-gray-100 rounded-2xl text-bakery-brown font-medium bg-transparent outline-none transition-all duration-300 focus:border-bakery-pink focus:bg-white hover:border-pink-100" placeholder=" " required />
+                        <label for="register-username" class="absolute left-4 top-3.5 text-gray-400 bg-white px-1 pointer-events-none transition-all duration-300 ease-in-out peer-placeholder-shown:top-3.5 peer-placeholder-shown:text-base peer-focus:-top-3 peer-focus:text-sm peer-focus:text-bakery-pink peer-focus:font-bold peer-[:not(:placeholder-shown)]:-top-3 peer-[:not(:placeholder-shown)]:text-sm peer-[:not(:placeholder-shown)]:text-bakery-pink">
+                            Nombre de usuario
+                        </label>
+                    </div>
+
+                    <!-- Campo Correo -->
+                    <div class="relative group">
+                        <input type="email" id="register-email" name="email" autocomplete="email" maxlength="254" class="peer w-full px-5 py-3.5 border-2 border-gray-100 rounded-2xl text-bakery-brown font-medium bg-transparent outline-none transition-all duration-300 focus:border-bakery-pink focus:bg-white hover:border-pink-100" placeholder=" " required />
+                        <label for="register-email" class="absolute left-4 top-3.5 text-gray-400 bg-white px-1 pointer-events-none transition-all duration-300 ease-in-out peer-placeholder-shown:top-3.5 peer-placeholder-shown:text-base peer-focus:-top-3 peer-focus:text-sm peer-focus:text-bakery-pink peer-focus:font-bold peer-[:not(:placeholder-shown)]:-top-3 peer-[:not(:placeholder-shown)]:text-sm peer-[:not(:placeholder-shown)]:text-bakery-pink">
+                            Correo electrónico
+                        </label>
+                    </div>
+
+                    <!-- Datos de contacto definidos para la tabla Cliente -->
+                    <div class="relative group">
+                        <input type="tel" id="register-phone" name="telefono" autocomplete="tel" maxlength="20" inputmode="tel"
+                               class="peer w-full px-5 py-3.5 border-2 border-gray-100 rounded-2xl text-bakery-brown font-medium bg-transparent outline-none transition-all duration-300 focus:border-bakery-pink focus:bg-white hover:border-pink-100"
+                               placeholder=" " required />
+                        <label for="register-phone" class="absolute left-4 top-3.5 text-gray-400 bg-white px-1 pointer-events-none transition-all duration-300 ease-in-out peer-placeholder-shown:top-3.5 peer-placeholder-shown:text-base peer-focus:-top-3 peer-focus:text-sm peer-focus:text-bakery-pink peer-focus:font-bold peer-[:not(:placeholder-shown)]:-top-3 peer-[:not(:placeholder-shown)]:text-sm peer-[:not(:placeholder-shown)]:text-bakery-pink">
+                            Teléfono de contacto
+                        </label>
+                    </div>
+                    <div class="relative group">
+                        <input type="text" id="register-address" name="direccion" autocomplete="street-address" maxlength="250"
+                               class="peer w-full px-5 py-3.5 border-2 border-gray-100 rounded-2xl text-bakery-brown font-medium bg-transparent outline-none transition-all duration-300 focus:border-bakery-pink focus:bg-white hover:border-pink-100"
+                               placeholder=" " />
+                        <label for="register-address" class="absolute left-4 top-3.5 text-gray-400 bg-white px-1 pointer-events-none transition-all duration-300 ease-in-out peer-placeholder-shown:top-3.5 peer-placeholder-shown:text-base peer-focus:-top-3 peer-focus:text-sm peer-focus:text-bakery-pink peer-focus:font-bold peer-[:not(:placeholder-shown)]:-top-3 peer-[:not(:placeholder-shown)]:text-sm peer-[:not(:placeholder-shown)]:text-bakery-pink">
+                            Dirección (opcional)
+                        </label>
+                    </div>
+
+                    <!-- Campo Contraseña -->
+                    <div class="relative">
+                        <input type="password" id="register-password" name="password" autocomplete="new-password" minlength="8" class="peer w-full px-5 py-3.5 border-2 border-gray-100 rounded-2xl text-bakery-brown font-medium bg-transparent outline-none transition-all duration-300 focus:border-bakery-pink focus:bg-white hover:border-pink-100 pr-12" placeholder=" " required />
+                        <label for="register-password" class="absolute left-4 top-3.5 text-gray-400 bg-white px-1 pointer-events-none transition-all duration-300 ease-in-out peer-placeholder-shown:top-3.5 peer-placeholder-shown:text-base peer-focus:-top-3 peer-focus:text-sm peer-focus:text-bakery-pink peer-focus:font-bold peer-[:not(:placeholder-shown)]:-top-3 peer-[:not(:placeholder-shown)]:text-sm peer-[:not(:placeholder-shown)]:text-bakery-pink">
+                            Contraseña
+                        </label>
+                        <!-- Botón mostrar/ocultar contraseña -->
+                        <button type="button" onclick="togglePassword('register-password', 'register-eye-icon')" class="absolute right-4 top-3.5 text-gray-400 hover:text-bakery-pink transition-colors focus:outline-none">
+                            <svg id="register-eye-icon" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                            </svg>
+                        </button>
+                    </div>
+
+                    <!-- Confirmación de contraseña -->
+                    <div class="relative group">
+                        <input type="password" id="register-password-confirm" name="password_confirm" autocomplete="new-password" minlength="8" class="peer w-full px-5 py-3.5 border-2 border-gray-100 rounded-2xl text-bakery-brown font-medium bg-transparent outline-none transition-all duration-300 focus:border-bakery-pink focus:bg-white hover:border-pink-100" placeholder=" " required />
+                        <label for="register-password-confirm" class="absolute left-4 top-3.5 text-gray-400 bg-white px-1 pointer-events-none transition-all duration-300 ease-in-out peer-placeholder-shown:top-3.5 peer-placeholder-shown:text-base peer-focus:-top-3 peer-focus:text-sm peer-focus:text-bakery-pink peer-focus:font-bold peer-[:not(:placeholder-shown)]:-top-3 peer-[:not(:placeholder-shown)]:text-sm peer-[:not(:placeholder-shown)]:text-bakery-pink">
+                            Confirmar contraseña
+                        </label>
+                    </div>
+                    <p class="text-xs text-bakery-brownLight">Al registrarte se creará una cuenta de cliente. Los accesos de empleados los gestiona el administrador.</p>
+                    <p id="register-message" role="status" aria-live="polite" class="hidden text-sm rounded-xl px-4 py-3"></p>
+
+                    <button id="register-submit" type="submit" class="w-full bg-bakery-brownLight hover:bg-bakery-brown text-white font-bold py-4 rounded-2xl shadow-lg shadow-amber-900/20 transform transition-all duration-300 hover:-translate-y-1 hover:shadow-xl active:scale-95 flex items-center justify-center mt-2">
+                        Crear cuenta
+                    </button>
+                </form>
+
+                <!-- Ir a Login -->
+                <div class="mt-6 text-center">
+                    <p class="text-gray-500 text-sm">
+                        ¿Ya tienes cuenta? 
+                        <a href="#" onclick="showLogin(event)" class="text-bakery-brownLight font-bold hover:text-bakery-brown hover:underline underline-offset-4 transition-colors">
+                            Inicia sesión aquí
+                        </a>
+                    </p>
+                </div>
+            </div>
+
+        </div>
+        <div class="px-8 pb-7 pt-1 text-center">
+          <button id="catalogo-abrir-visitante" class="text-bakery-brownLight font-bold hover:text-bakery-pink underline underline-offset-4" type="button">Explorar el catálogo sin iniciar sesión</button>
+        </div>
+    </main>

@@ -1,0 +1,63 @@
+<section id="sigep-vista-reportes" hidden aria-label="Dashboard y reportes administrativos">
+            <div class="sigep-kicker">ADMINISTRACIÓN / ANÁLISIS</div>
+            <div class="sigep-intro"><div><h1>Dashboard y reportes</h1>
+              <p>Consulta pedidos, cobros, productos e inventario con información real de SIGEP.</p></div></div>
+            <div class="reportes-toolbar">
+              <div class="reportes-filtros">
+                <label>Desde <input type="date" id="reportes-desde" aria-label="Fecha inicial del reporte"></label>
+                <label>Hasta <input type="date" id="reportes-hasta" aria-label="Fecha final del reporte"></label>
+              </div>
+              <div class="reportes-acciones">
+                <button id="reportes-actualizar" class="sigep-button sigep-button-primary" type="button">Actualizar</button>
+              </div>
+            </div>
+            <p id="reportes-aviso" class="reportes-aviso" role="status" hidden></p>
+            <p id="reportes-periodo" class="reportes-periodo" aria-live="polite"></p>
+            <div class="reportes-kpis" aria-label="Indicadores administrativos">
+              <div class="reportes-kpi"><small>PEDIDOS REGISTRADOS</small><strong id="reportes-pedidos-total">—</strong></div>
+              <div class="reportes-kpi"><small>IMPORTE DE PEDIDOS</small><strong id="reportes-importe">—</strong></div>
+              <div class="reportes-kpi"><small>COBROS RECIBIDOS</small><strong id="reportes-cobros">—</strong></div>
+              <div class="reportes-kpi"><small>SALDO DE PEDIDOS</small><strong id="reportes-saldo">—</strong></div>
+              <div class="reportes-kpi"><small>TICKET PROMEDIO</small><strong id="reportes-ticket">—</strong></div>
+              <div class="reportes-kpi"><small>CLIENTES NUEVOS</small><strong id="reportes-clientes">—</strong></div>
+            </div>
+            <div class="reportes-grid">
+              <section class="reportes-panel" aria-labelledby="reportes-grafica-titulo">
+                <h2 id="reportes-grafica-titulo">Cobros registrados</h2>
+                <p>Importes recibidos por fecha. La gráfica agrupa los días cuando el período es amplio.</p>
+                <div id="reportes-grafica" class="reportes-grafica"></div>
+              </section>
+              <section class="reportes-panel" aria-labelledby="reportes-estados-titulo">
+                <h2 id="reportes-estados-titulo">Estados de pedidos</h2>
+                <p>Distribución de pedidos creados en el período seleccionado.</p>
+                <div id="reportes-estados"></div>
+              </section>
+            </div>
+            <div class="reportes-grid">
+              <section class="reportes-panel" aria-labelledby="reportes-productos-titulo">
+                <h2 id="reportes-productos-titulo">Productos más solicitados</h2>
+                <p>Pedidos no cancelados; cantidades y precios históricos.</p>
+                <div class="reportes-tabla-contenedor"><table class="reportes-tabla"><thead><tr>
+                  <th>Producto</th><th>Unidades</th><th>Importe</th>
+                </tr></thead><tbody id="reportes-productos"></tbody></table></div>
+                <p id="reportes-productos-vacio" class="reportes-vacio" hidden>No hay productos solicitados en estas fechas.</p>
+              </section>
+              <section class="reportes-panel" aria-labelledby="reportes-alertas-titulo">
+                <h2 id="reportes-alertas-titulo">Alertas de inventario: <span id="reportes-alertas-total">0</span></h2>
+                <p>Estado actual del stock, independiente de las fechas seleccionadas.</p>
+                <div class="reportes-tabla-contenedor"><table class="reportes-tabla"><thead><tr>
+                  <th>Ingrediente</th><th>Existencia</th><th>Mínimo</th>
+                </tr></thead><tbody id="reportes-alertas"></tbody></table></div>
+                <p id="reportes-alertas-vacio" class="reportes-vacio" hidden>No hay alertas de inventario.</p>
+              </section>
+            </div>
+            <section class="reportes-panel" aria-label="Exportación y criterios de los reportes">
+              <h2>Exportar reportes</h2>
+              <p>Descarga los registros del período en CSV compatible con hojas de cálculo.</p>
+              <div class="reportes-botones">
+                <button id="reportes-exportar-pedidos" class="sigep-button sigep-button-outline" type="button">Descargar pedidos CSV</button>
+                <button id="reportes-exportar-pagos" class="sigep-button sigep-button-outline" type="button">Descargar pagos CSV</button>
+              </div>
+              <div id="reportes-nota" class="reportes-pie"></div>
+            </section>
+          </section>

@@ -43,7 +43,7 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = "config.urls"
 TEMPLATES = [
-    {"BACKEND": "django.template.backends.django.DjangoTemplates", "DIRS": [BASE_DIR.parent / "frontend"], "APP_DIRS": True,
+    {"BACKEND": "django.template.backends.django.DjangoTemplates", "DIRS": [BASE_DIR.parent / "frontend" / "templates"], "APP_DIRS": True,
      "OPTIONS": {"context_processors": [
          "django.template.context_processors.debug",
          "django.template.context_processors.request",
@@ -99,7 +99,7 @@ STATIC_URL = "static/"
 MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "media"
 # El frontend se sirve desde Django en la MISMA URL y puerto 8000.
-STATICFILES_DIRS = [BASE_DIR.parent / "frontend"]
+STATICFILES_DIRS = [BASE_DIR.parent / "frontend" / "static"]
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 # CORS opcional, solo para quien pruebe otro servidor frontend (p. ej. puerto 5500).

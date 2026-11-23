@@ -1,0 +1,18 @@
+<dialog id="inventario-ingrediente-dialog" class="inventario-dialog" aria-labelledby="inventario-ingrediente-titulo">
+      <form id="inventario-ingrediente-form">
+        <div class="inventario-dialog-head"><h2 id="inventario-ingrediente-titulo">Nuevo ingrediente</h2>
+          <button id="inventario-ingrediente-cerrar" class="sigep-close" type="button" aria-label="Cerrar">×</button></div>
+        <div class="inventario-dialog-campos">
+          <label>Nombre *<input id="inventario-ingrediente-nombre" maxlength="120" required></label>
+          <label>Unidad base *<select id="inventario-ingrediente-unidad" required>
+            <option value="KG">Kilogramo</option><option value="G">Gramo</option><option value="L">Litro</option>
+            <option value="ML">Mililitro</option><option value="PIEZA">Pieza</option>
+          </select></label>
+          <label class="ancho">Descripción<input id="inventario-ingrediente-descripcion" maxlength="250"></label>
+          <label>Stock mínimo *<input id="inventario-ingrediente-minimo" type="number" min="0" step="0.001" value="0.000" required></label>
+          <label>Costo unitario ($) *<input id="inventario-ingrediente-costo" type="number" min="0" step="0.01" value="0.00" required></label>
+        </div>
+        <p id="inventario-ingrediente-aviso" role="status" hidden></p>
+        <div class="inventario-dialog-acciones"><button id="inventario-ingrediente-guardar" type="submit" class="sigep-button sigep-button-primary">Guardar ingrediente</button></div>
+      </form>
+    </dialog>

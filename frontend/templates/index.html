@@ -1,0 +1,105 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SIGEP | Dulce Encanto - Acceso y registro</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        bakery: {
+                            vanilla: '#FFF5E4',
+                            pink: '#FF94B7',
+                            pinkHover: '#F7709D',
+                            brown: '#5C3D2E',
+                            brownLight: '#8B5E3C',
+                            cream: '#FFE3E1',
+                        }
+                    },
+                    fontFamily: {
+                        'sans': ['Nunito', 'sans-serif'],
+                        'cursive': ['Dancing Script', 'cursive'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <link rel="stylesheet" href="{% static 'css/base.css' %}">
+    <!-- Estilos exclusivos del módulo de clientes (Fase 2) -->
+    <link rel="stylesheet" href="{% static 'css/clientes.css' %}">
+    <link rel="stylesheet" href="{% static 'css/productos.css' %}">
+    <link rel="stylesheet" href="{% static 'css/catalogo.css' %}">
+    <link rel="stylesheet" href="{% static 'css/pedidos.css' %}">
+    <link rel="stylesheet" href="{% static 'css/perfil.css' %}">
+    <link rel="stylesheet" href="{% static 'css/inventario.css' %}">
+    <link rel="stylesheet" href="{% static 'css/reportes.css' %}">
+</head>
+<body class="bg-bakery-vanilla min-h-screen flex items-center justify-center p-4 selection:bg-bakery-pink selection:text-white relative overflow-x-hidden">
+    
+    <!-- Elementos decorativos de fondo (Círculos abstractos) -->
+    <div class="absolute top-[-10%] left-[-10%] w-64 h-64 rounded-full bg-bakery-cream opacity-50 blur-3xl animate-float"></div>
+    <div class="absolute bottom-[-10%] right-[-5%] w-80 h-80 rounded-full bg-pink-100 opacity-60 blur-3xl animate-float" style="animation-delay: 2s;"></div>
+
+    <!-- Contenedor principal de la tarjeta -->
+    {% include 'partials/acceso/acceso.html' %}
+
+    <!-- Vista provisional posterior al login, antes del dashboard real de SIGEP -->
+    {% include 'partials/sesion/inicio.html' %}
+
+
+    <!-- Perfil personal independiente: mismo formulario para clientes y personal. -->
+    {% include 'partials/perfil/mi_perfil.html' %}
+
+    <!-- FASE 3: Vista del catálogo para visitantes y vista previa desde otras cuentas -->
+    {% include 'partials/catalogo/catalogo_publico.html' %}
+
+    <!-- FASE 2: módulo de clientes visible únicamente para ADMIN y VENTAS -->
+    {% include 'partials/dashboard/panel.html' %}
+
+    <!-- Fase 5: alta y edición de ingredientes. -->
+    {% include 'partials/modales/inventario-ingrediente-dialog.html' %}
+
+    <!-- Fase 5: un movimiento constituye un asiento permanente de stock. -->
+    {% include 'partials/modales/inventario-movimiento-dialog.html' %}
+
+    <!-- Fase 4: captura de pedido, precio final calculado por Django -->
+    {% include 'partials/modales/pedido-dialog.html' %}
+
+    {% include 'partials/modales/pedido-detalle-dialog.html' %}
+
+    <!-- Solo ADMIN: cambiar el rol de una cuenta existente. -->
+    {% include 'partials/modales/usuario-rol-dialog.html' %}
+
+    <!-- Formulario de alta y edición, sin cambiar de página -->
+    {% include 'partials/modales/cliente-dialog.html' %}
+
+
+    <!-- Alta / edición de producto: campos alineados con la tabla productos. -->
+    {% include 'partials/modales/producto-dialog.html' %}
+
+    <!-- Alta / edición de categoría. -->
+    {% include 'partials/modales/categoria-dialog.html' %}
+
+    <script src="{% static 'js/auth-ui.js' %}" defer></script>
+    <script src="{% static 'js/app.js' %}" defer></script>
+    <script src="{% static 'js/clientes.js' %}" defer></script>
+    <script src="{% static 'js/usuarios.js' %}" defer></script>
+    <script src="{% static 'js/productos.js' %}" defer></script>
+    <script src="{% static 'js/catalogo.js' %}" defer></script>
+    <script src="{% static 'js/pedidos.js' %}" defer></script>
+    <script src="{% static 'js/perfil.js' %}" defer></script>
+    <script src="{% static 'js/inventario.js' %}" defer></script>
+    <script src="{% static 'js/reportes.js' %}" defer></script>
+</body>
+</html>

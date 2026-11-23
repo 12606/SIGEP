@@ -1,0 +1,29 @@
+<dialog id="producto-dialog" class="sigep-dialog" aria-labelledby="producto-dialog-title">
+      <form id="producto-form">
+        <div class="sigep-dialog-top"><div><span class="sigep-kicker">SIGEP · CATÁLOGO</span><h2 id="producto-dialog-title">Nuevo producto</h2></div>
+          <button id="producto-cerrar" type="button" class="sigep-close" aria-label="Cerrar">×</button></div>
+        <p class="sigep-dialog-description">Los campos marcados con * son obligatorios.</p>
+        <div class="sigep-form-grid">
+          <label>Nombre *<input id="producto-nombre" required maxlength="120" autocomplete="off"></label>
+          <label>Categoría *<select id="producto-categoria" required></select></label>
+          <label>Precio base (MXN) *<input id="producto-precio" type="number" step="0.01" min="0.01" required></label>
+          <label>Unidad de venta *<select id="producto-unidad" required>
+            <option value="PIEZA">Pieza</option><option value="CAJA">Caja</option>
+            <option value="PORCION">Porción</option><option value="KG">Kilogramo</option>
+          </select></label>
+          <div class="sigep-span2 sigep-imagen-campo">
+            <label for="producto-imagen-archivo">Imagen del producto (opcional)</label>
+            <input id="producto-imagen-archivo" type="file" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp">
+            <small>JPG, PNG o WebP · máximo 3 MB · entre 100 y 4096 píxeles por lado.</small>
+            <div class="sigep-imagen-preview-fila">
+              <img id="producto-imagen-preview" alt="Vista previa de imagen del producto" hidden>
+              <span id="producto-imagen-nota" aria-live="polite">Sin imagen seleccionada.</span>
+            </div>
+          </div>
+          <label class="sigep-span2">Descripción<textarea id="producto-descripcion" rows="3"></textarea></label>
+        </div>
+        <p id="producto-error" class="sigep-form-error" role="alert" hidden></p>
+        <div class="sigep-dialog-actions"><button id="producto-cancelar" type="button" class="sigep-button sigep-button-outline">Cancelar</button>
+          <button id="producto-guardar" type="submit" class="sigep-button sigep-button-primary">Guardar producto</button></div>
+      </form>
+    </dialog>
