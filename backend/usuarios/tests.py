@@ -202,7 +202,7 @@ class FrontendIntegracionTests(APITestCase):
         respuesta = self.client.get("/")
         self.assertEqual(respuesta.status_code, 200)
         self.assertContains(respuesta, "Dulce Encanto")
-        self.assertContains(respuesta, "/static/app.js")
+        self.assertContains(respuesta, "/static/js/app.js")
 
 class RegistroDatosYRolesTests(APITestCase):
     """Garantiza consistencia con la fase 1 y protege la asignación de roles."""
