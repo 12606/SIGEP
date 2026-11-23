@@ -1,0 +1,13 @@
+<dialog id="categoria-dialog" class="sigep-dialog" aria-labelledby="categoria-dialog-title">
+      <form id="categoria-form">
+        <div class="sigep-dialog-top"><div><span class="sigep-kicker">SIGEP · CATÁLOGO</span><h2 id="categoria-dialog-title">Nueva categoría</h2></div>
+          <button id="categoria-cerrar" type="button" class="sigep-close" aria-label="Cerrar">×</button></div>
+        <div class="sigep-form-grid">
+          <label class="sigep-span2">Nombre *<input id="categoria-nombre" required maxlength="90"></label>
+          <label class="sigep-span2">Descripción<textarea id="categoria-descripcion" maxlength="250" rows="3"></textarea></label>
+        </div>
+        <p id="categoria-error" class="sigep-form-error" role="alert" hidden></p>
+        <div class="sigep-dialog-actions"><button id="categoria-cancelar" type="button" class="sigep-button sigep-button-outline">Cancelar</button>
+          <button id="categoria-guardar" type="submit" class="sigep-button sigep-button-primary">Guardar categoría</button></div>
+      </form>
+    </dialog>

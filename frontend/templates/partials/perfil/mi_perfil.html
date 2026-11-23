@@ -1,0 +1,26 @@
+<section id="perfil-panel" class="hidden sigep-perfil-shell relative z-10" aria-label="Mi perfil">
+      <div class="sigep-perfil-card">
+        <div class="sigep-perfil-top">
+          <div><span class="sigep-kicker">MI CUENTA</span><h2>Mi perfil</h2>
+            <p>Consulta y actualiza tus datos personales. Tu rol se gestiona por administración.</p></div>
+          <button id="perfil-volver" type="button" class="sigep-button sigep-button-outline">Volver</button>
+        </div>
+        <p id="perfil-feedback" role="status" class="sigep-feedback" hidden></p>
+        <form id="perfil-form">
+          <div class="sigep-perfil-campos">
+            <label>Nombre(s)<input id="perfil-nombre" maxlength="100" required autocomplete="given-name"></label>
+            <label>Apellidos<input id="perfil-apellidos" maxlength="150" required autocomplete="family-name"></label>
+            <label>Correo electrónico<input id="perfil-correo" type="email" maxlength="254" required autocomplete="email"></label>
+            <label>Teléfono<input id="perfil-telefono" type="tel" maxlength="20" autocomplete="tel" placeholder="10 a 15 dígitos"></label>
+            <label id="perfil-direccion-contenedor" class="sigep-perfil-ancho">Dirección<input id="perfil-direccion" maxlength="250" autocomplete="street-address"></label>
+          </div>
+          <div class="sigep-perfil-sololectura">
+            <p><strong>Usuario:</strong> <span id="perfil-usuario"></span></p>
+            <p><strong>Rol:</strong> <span id="perfil-rol"></span></p>
+          </div>
+          <div class="sigep-perfil-acciones">
+            <button type="submit" id="perfil-guardar" class="sigep-button sigep-button-primary">Guardar cambios</button>
+          </div>
+        </form>
+      </div>
+    </section>

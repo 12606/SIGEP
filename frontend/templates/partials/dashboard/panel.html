@@ -1,0 +1,40 @@
+<section id="clientes-panel" class="hidden sigep-dashboard-shell relative z-10" aria-label="Gestión de clientes">
+      <div class="sigep-dashboard">
+        <header class="sigep-header">
+          <div class="sigep-brand"><span class="sigep-mark" aria-hidden="true">🧁</span>
+            <span><strong>Dulce Encanto</strong><small>SIGEP · Panel de gestión</small></span>
+          </div>
+          <div class="sigep-header-right"><span id="clientes-usuario" class="sigep-user"></span>
+            <button id="perfil-abrir-personal" class="sigep-button sigep-button-outline" type="button">Mi perfil</button>
+            <button id="catalogo-abrir-panel" class="sigep-button sigep-button-outline" type="button">Ver catálogo como cliente</button>
+            <button id="clientes-logout-button" class="sigep-button sigep-button-outline" type="button">Cerrar sesión</button>
+          </div>
+        </header>
+        <div class="sigep-content">
+          <nav id="sigep-admin-tabs" class="sigep-tabs" aria-label="Secciones de administración" hidden>
+            <button id="sigep-tab-clientes" type="button" class="sigep-tab sigep-tab-active" aria-selected="true">Clientes</button>
+            <button id="sigep-tab-usuarios" type="button" class="sigep-tab" aria-selected="false">Usuarios y roles</button>
+            <button id="sigep-tab-productos" type="button" class="sigep-tab" aria-selected="false">Productos</button>
+            <button id="sigep-tab-pedidos" type="button" class="sigep-tab" aria-selected="false">Pedidos y pagos</button>
+            <button id="sigep-tab-inventario" type="button" class="sigep-tab" aria-selected="false" hidden>Inventario</button>
+            <button id="sigep-tab-reportes" type="button" class="sigep-tab" aria-selected="false" hidden>Reportes</button>
+          </nav>
+          {% include 'partials/modulos/clientes.html' %}<!-- /sigep-vista-clientes -->
+
+          <!-- Administracion de CUENTAS (solo ADMIN). Se diferencia de las fichas comerciales. -->
+          {% include 'partials/modulos/usuarios.html' %}
+
+          <!-- FASE 3: catálogo de categorías y productos. Escritura solo ADMIN. -->
+          {% include 'partials/modulos/productos.html' %}<!-- /sigep-vista-productos -->
+
+          <!-- Fase 4: gestión administrativa y ventas -->
+          {% include 'partials/modulos/pedidos.html' %}<!-- /sigep-vista-pedidos -->
+
+          <!-- Fase 5: ADMIN y ALMACEN administran inventario. -->
+          {% include 'partials/modulos/inventario.html' %}<!-- /sigep-vista-inventario -->
+
+          <!-- Fase 6: dashboard y reportes. Acceso únicamente ADMIN. -->
+          {% include 'partials/modulos/reportes.html' %}<!-- /sigep-vista-reportes -->
+        </div>
+      </div>
+    </section>

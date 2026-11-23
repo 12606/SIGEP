@@ -1,0 +1,17 @@
+<dialog id="pedido-dialog" class="pedidos-dialog" aria-labelledby="pedido-dialog-titulo">
+      <form id="pedido-nuevo-form">
+        <div class="pedidos-dialog-header"><h2 id="pedido-dialog-titulo">Nuevo pedido</h2><button id="pedido-cerrar" type="button" class="sigep-close" aria-label="Cerrar">×</button></div>
+        <p>Selecciona una fecha de entrega futura y agrega los productos.</p>
+        <div class="pedidos-form-campos">
+          <label id="pedido-cliente-grupo">Cliente *<select id="pedido-cliente"></select></label>
+          <label>Fecha y hora de entrega *<input id="pedido-fecha-entrega" type="datetime-local" required></label>
+          <label class="pedidos-span2">Observaciones<textarea id="pedido-observaciones" maxlength="1000" rows="2" placeholder="Indicaciones de entrega"></textarea></label>
+        </div>
+        <h3>Productos solicitados</h3>
+        <div id="pedido-lineas"></div>
+        <button id="pedido-anadir-producto" class="sigep-button sigep-button-outline" type="button">+ Agregar producto</button>
+        <p class="pedidos-total">Total: <span id="pedido-total-estimado">$0.00</span></p>
+        <p id="pedido-nuevo-aviso" role="alert" hidden></p>
+        <div class="pedidos-dialog-acciones"><button id="pedido-guardar" type="submit" class="sigep-button sigep-button-primary">Registrar pedido</button></div>
+      </form>
+    </dialog>

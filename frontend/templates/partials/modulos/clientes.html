@@ -1,0 +1,35 @@
+<div id="sigep-vista-clientes">
+          <div class="sigep-kicker">ADMINISTRACIÓN / CLIENTES</div>
+          <div class="sigep-intro">
+            <div><h1>Gestión de clientes</h1><p>Consulta la información de tus clientes y mantén sus datos actualizados.</p></div>
+            <button id="clientes-nuevo" type="button" class="sigep-button sigep-button-primary">+ Registrar cliente</button>
+          </div>
+          <div class="sigep-stats" aria-label="Resumen de resultados">
+            <div class="sigep-stat"><span>Clientes encontrados</span><strong id="clientes-total">0</strong><small>En el filtro actual</small></div>
+            <div class="sigep-stat"><span>Activos</span><strong id="clientes-activos">0</strong><small>En el filtro actual</small></div>
+            <div class="sigep-stat"><span>Inactivos</span><strong id="clientes-inactivos">0</strong><small>En el filtro actual</small></div>
+          </div>
+          <div class="sigep-list-card">
+            <div class="sigep-list-top">
+              <div><h2>Directorio de clientes</h2><p>Búsqueda y administración de fichas</p></div>
+              <button id="clientes-refrescar" type="button" class="sigep-button sigep-button-outline">Actualizar</button>
+            </div>
+            <div class="sigep-filters">
+              <label class="sigep-filter-search">Buscar cliente
+                <input id="clientes-buscar" type="search" placeholder="Nombre, apellido, teléfono o correo" autocomplete="off"/>
+              </label>
+              <label class="sigep-filter-status">Estado
+                <select id="clientes-estado-filtro"><option value="">Todos</option><option value="true">Activos</option><option value="false">Inactivos</option></select>
+              </label>
+            </div>
+            <div id="clientes-feedback" class="sigep-feedback" role="status" aria-live="polite" hidden></div>
+            <div class="sigep-table-scroll">
+              <table class="sigep-table">
+                <thead><tr><th>Cliente</th><th>Contacto</th><th>Dirección</th><th id="clientes-cuenta-col">Cuenta web</th><th>Estado</th><th>Acciones</th></tr></thead>
+                <tbody id="clientes-tbody"></tbody>
+              </table>
+            </div>
+            <div id="clientes-vacio" class="sigep-empty" hidden>No se encontraron clientes para este filtro.</div>
+            <div class="sigep-list-foot">Los registros desactivados permanecen guardados en MariaDB.</div>
+          </div>
+          </div>

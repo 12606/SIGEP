@@ -1,0 +1,17 @@
+<section id="session-panel" class="hidden w-full max-w-lg bg-white rounded-[2rem] shadow-xl p-9 relative z-10 text-center" aria-live="polite">
+        <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-bakery-cream text-3xl mb-4">🧁</div>
+        <h2 class="font-cursive text-3xl text-bakery-brown mb-2">¡Bienvenido a Dulce Encanto!</h2>
+        <p id="session-name" class="text-bakery-brown font-bold text-lg mb-1"></p>
+        <p id="session-role" class="text-bakery-brownLight text-sm mb-5"></p>
+        <p class="text-gray-500 text-sm mb-6">Explora los módulos disponibles para tu cuenta.</p>
+        <button id="perfil-abrir-sesion" type="button" class="sigep-button sigep-button-outline mb-5 w-full">Mi perfil · Ver y editar datos</button>
+        <div id="catalogo-en-sesion" class="hidden" aria-label="Catálogo disponible para clientes"></div>
+        <!-- Fase 4: cliente, pedidos propios -->
+        {% include 'partials/modulos/mis_pedidos.html' %}
+        <!-- Fase 4: repostero, solo seguimiento de producción -->
+        {% include 'partials/modulos/produccion.html' %}
+        <!-- Fase 5: REPOSTERO consulta existencias sin costos ni movimientos. -->
+        {% include 'partials/modulos/existencias_repostero.html' %}
+        <button id="catalogo-abrir-sesion" type="button" class="hidden catalogo-button catalogo-button-primary mb-4">Explorar catálogo de productos</button>
+        <button id="logout-button" type="button" class="w-full bg-bakery-pink hover:bg-bakery-pinkHover text-white font-bold py-3 rounded-2xl transition-colors">Cerrar sesión</button>
+    </section>

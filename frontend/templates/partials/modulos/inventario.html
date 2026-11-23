@@ -1,0 +1,31 @@
+<div id="sigep-vista-inventario" hidden>
+            <div class="sigep-kicker">ADMINISTRACIÓN / INVENTARIO</div>
+            <div class="sigep-intro"><div><h1>Ingredientes e inventario</h1><p>Control de materias primas, entradas, salidas y alertas de stock.</p></div>
+              <button id="inventario-nuevo" type="button" class="sigep-button sigep-button-primary">+ Nuevo ingrediente</button>
+            </div>
+            <div class="sigep-stats">
+              <div class="sigep-stat"><span>Ingredientes encontrados</span><strong id="inventario-total">0</strong></div>
+              <div class="sigep-stat"><span>Existencias bajas</span><strong id="inventario-alertas-total">0</strong></div>
+              <div class="sigep-stat"><span>Inactivos</span><strong id="inventario-inactivos">0</strong></div>
+            </div>
+            <div class="sigep-list-card">
+              <div class="sigep-list-top"><div><h2>Listado de ingredientes</h2><p>El stock se calcula mediante movimientos, no se edita directamente.</p></div>
+                <button id="inventario-actualizar" type="button" class="sigep-button sigep-button-outline">Actualizar</button></div>
+              <div class="sigep-filters">
+                <label class="sigep-filter-search">Buscar ingrediente<input id="inventario-buscar" type="search" placeholder="Nombre o descripción"></label>
+                <label class="sigep-filter-status">Estado<select id="inventario-filtro-estado"><option value="">Todos</option><option value="true">Activos</option><option value="false">Inactivos</option></select></label>
+              </div>
+              <p id="inventario-aviso" role="status" hidden></p>
+              <div class="sigep-table-scroll"><table class="sigep-table"><thead><tr>
+                <th>Ingrediente</th><th>Existencia</th><th>Stock mínimo</th><th>Costo unitario</th><th>Estado</th><th>Acciones</th>
+              </tr></thead><tbody id="inventario-tabla"></tbody></table></div>
+              <p id="inventario-vacio" class="sigep-empty" hidden>No hay ingredientes registrados.</p>
+            </div>
+            <div class="sigep-list-card inventario-separador">
+              <div class="sigep-list-top"><div><h2>Historial de movimientos</h2><p>Entradas, salidas y mermas registrados por empleados.</p></div></div>
+              <div class="sigep-table-scroll"><table class="sigep-table"><thead><tr>
+                <th>Fecha</th><th>Ingrediente</th><th>Tipo</th><th>Cantidad</th><th>Registrado por</th><th>Motivo</th>
+              </tr></thead><tbody id="inventario-historial"></tbody></table></div>
+              <p id="inventario-historial-vacio" class="sigep-empty" hidden>No se han registrado movimientos.</p>
+            </div>
+          </div>

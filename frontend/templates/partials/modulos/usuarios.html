@@ -1,0 +1,32 @@
+<div id="sigep-vista-usuarios" hidden>
+            <div class="sigep-kicker">ADMINISTRACIÓN / ACCESOS</div>
+            <div class="sigep-intro">
+              <div>
+                <h1>Usuarios y roles</h1>
+                <p>Administra el tipo de cuenta y los permisos de acceso al sistema.</p>
+              </div>
+            </div>
+            <div class="sigep-list-card">
+              <div class="sigep-list-top">
+                <div><h2>Cuentas registradas</h2><p>ADMIN · VENTAS · REPOSTERO · ALMACEN · CLIENTE</p></div>
+                <button id="usuarios-refrescar" type="button" class="sigep-button sigep-button-outline">Actualizar</button>
+              </div>
+              <div class="sigep-filters">
+                <label class="sigep-filter-search">Buscar cuenta
+                  <input id="usuarios-buscar" type="search" placeholder="Usuario, correo o nombre" autocomplete="off" />
+                </label>
+                <label class="sigep-filter-status">Estado de cuenta
+                  <select id="usuarios-filtro"><option value="">Todas</option><option value="true">Activas</option><option value="false">Inactivas</option></select>
+                </label>
+              </div>
+              <div id="usuarios-feedback" class="sigep-feedback" role="status" aria-live="polite" hidden></div>
+              <div class="sigep-table-scroll">
+                <table class="sigep-table">
+                  <thead><tr><th>Usuario</th><th>Correo</th><th>Rol asignado</th><th>Estado</th><th>Acciones</th></tr></thead>
+                  <tbody id="usuarios-tbody"></tbody>
+                </table>
+              </div>
+              <div id="usuarios-vacio" class="sigep-empty" hidden>No se encontraron cuentas.</div>
+              <div class="sigep-list-foot">La cuenta de un superusuario y tu propio rol están protegidos contra cambios accidentales.</div>
+            </div>
+          </div>

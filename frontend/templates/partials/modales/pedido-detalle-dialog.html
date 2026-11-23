@@ -1,0 +1,18 @@
+<dialog id="pedido-detalle-dialog" class="pedidos-dialog" aria-labelledby="pedido-detalle-folio">
+      <div class="pedidos-dialog-header"><h2 id="pedido-detalle-folio">Pedido</h2>
+        <button id="pedido-detalle-cerrar" type="button" class="sigep-close" aria-label="Cerrar">×</button></div>
+      <div id="pedido-detalle-contenido"></div>
+      <div id="pedido-estado-acciones" class="pedidos-estado-acciones"></div>
+      <form id="pedido-pago-form" hidden>
+        <h3>Registrar anticipo o pago</h3>
+        <div class="pedidos-pago-campos">
+          <label>Monto (MXN)<input id="pedido-pago-monto" type="number" min="0.01" step="0.01" required></label>
+          <label>Método<select id="pedido-pago-metodo" required>
+            <option value="EFECTIVO">Efectivo</option><option value="TRANSFERENCIA">Transferencia</option><option value="TARJETA">Tarjeta</option>
+          </select></label>
+          <label>Referencia<input id="pedido-pago-referencia" maxlength="120" placeholder="Opcional"></label>
+        </div>
+        <div class="pedidos-dialog-acciones"><button id="pedido-pago-guardar" class="sigep-button sigep-button-primary" type="submit">Registrar pago</button></div>
+      </form>
+      <p id="pedido-detalle-aviso" role="alert" hidden></p>
+    </dialog>

@@ -1,0 +1,27 @@
+<div id="sigep-vista-pedidos" hidden>
+            <div class="sigep-kicker">ADMINISTRACIÓN / PEDIDOS</div>
+            <div class="sigep-intro">
+              <div><h1>Pedidos y pagos</h1><p>Solicitudes, preparación, anticipos y entregas.</p></div>
+              <button id="pedidos-nuevo-admin" type="button" class="sigep-button sigep-button-primary">+ Nuevo pedido</button>
+            </div>
+            <div class="sigep-stats">
+              <div class="sigep-stat"><span>Pedidos encontrados</span><strong id="pedidos-numero">0</strong></div>
+              <div class="sigep-stat"><span>Sin confirmar</span><strong id="pedidos-pendientes">0</strong></div>
+              <div class="sigep-stat"><span>En proceso</span><strong id="pedidos-por-entregar">0</strong></div>
+            </div>
+            <div class="sigep-list-card">
+              <div class="sigep-list-top"><div><h2>Seguimiento de pedidos</h2><p>Consulta saldos y actualiza estados.</p></div>
+                <button id="pedidos-refrescar" type="button" class="sigep-button sigep-button-outline">Actualizar</button></div>
+              <div class="sigep-filters"><label class="sigep-filter-status">Estado
+                <select id="pedidos-filtro-estado"><option value="">Todos</option>
+                  <option value="PENDIENTE">Pendiente</option><option value="CONFIRMADO">Confirmado</option>
+                  <option value="EN_PREPARACION">En preparación</option><option value="LISTO">Listo</option>
+                  <option value="ENTREGADO">Entregado</option><option value="CANCELADO">Cancelado</option>
+                </select></label></div>
+              <p id="pedidos-admin-aviso" role="status" hidden></p>
+              <div class="sigep-table-scroll"><table class="sigep-table">
+                <thead><tr><th>Folio</th><th>Cliente</th><th>Entrega</th><th>Total</th><th>Saldo</th><th>Estado</th><th>Acción</th></tr></thead>
+                <tbody id="pedidos-tabla"></tbody></table></div>
+              <p id="pedidos-tabla-vacia" class="sigep-empty" hidden>No existen pedidos con ese estado.</p>
+            </div>
+          </div>

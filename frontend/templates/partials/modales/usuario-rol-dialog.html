@@ -1,0 +1,20 @@
+<dialog id="usuario-rol-dialog" class="sigep-dialog" aria-labelledby="usuario-rol-title">
+      <form id="usuario-rol-form">
+        <div class="sigep-dialog-top">
+          <div><span class="sigep-kicker">SIGEP · CONTROL DE ACCESO</span><h2 id="usuario-rol-title">Cambiar rol de usuario</h2></div>
+          <button id="usuario-rol-cerrar" type="button" class="sigep-close" aria-label="Cerrar">×</button>
+        </div>
+        <p id="usuario-rol-resumen" class="sigep-dialog-description"></p>
+        <div class="sigep-form-grid">
+          <label class="sigep-span2">Nuevo rol
+            <select id="usuario-rol-select" required></select>
+          </label>
+        </div>
+        <p class="sigep-dialog-description">Modificar el rol cambia las funciones que puede utilizar esa cuenta. El usuario deberá iniciar sesión nuevamente para actualizar la vista del panel.</p>
+        <p id="usuario-rol-error" class="sigep-form-error" role="alert" hidden></p>
+        <div class="sigep-dialog-actions">
+          <button id="usuario-rol-cancelar" type="button" class="sigep-button sigep-button-outline">Cancelar</button>
+          <button id="usuario-rol-guardar" type="submit" class="sigep-button sigep-button-primary">Guardar rol</button>
+        </div>
+      </form>
+    </dialog>
