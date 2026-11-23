@@ -11,6 +11,7 @@ El proyecto está desarrollado con **Django REST Framework, MariaDB, HTML, CSS y
 - [Funcionalidades](#funcionalidades)
 - [Tecnologías](#tecnologías)
 - [Estructura del proyecto](#estructura-del-proyecto)
+- [Organización modular del frontend](#organización-modular-del-frontend)
 - [Requisitos](#requisitos)
 - [Instalación local en Windows](#instalación-local-en-windows)
 - [Opcional: MariaDB con Docker](#opcional-mariadb-con-docker)
@@ -45,32 +46,71 @@ Las autorizaciones también se comprueban en la API: ocultar una opción en el n
 
 - **Backend:** Python, Django 5.2, Django REST Framework y SimpleJWT.
 - **Base de datos:** MariaDB (a través del backend MySQL de Django).
-- **Frontend:** HTML, CSS, JavaScript y Tailwind CSS en el prototipo de desarrollo.
+- **Frontend:** HTML, plantillas Django reutilizables, CSS y JavaScript organizados por módulos; Tailwind CSS en el prototipo de desarrollo.
 - **Herramientas:** Git, VS Code, HeidiSQL (opcional) y Docker Compose (opcional para MariaDB).
 
 ## Estructura del proyecto
 
+Tras la modularización del frontend, la página principal se encuentra en `frontend/templates/index.html`. Las pantallas están distribuidas en plantillas parciales y los estilos y scripts se sirven desde `frontend/static/`.
+
 ```text
 SIGEP/
 ├── backend/
-│   ├── config/              # Configuración principal de Django
-│   ├── usuarios/            # Cuentas, roles y autenticación
-│   ├── clientes/            # Gestión de clientes
-│   ├── productos/           # Categorías, productos y catálogo
-│   ├── pedidos/             # Pedidos y pagos
-│   ├── inventario/          # Ingredientes y movimientos
-│   ├── reportes/            # Indicadores y exportaciones
+│   ├── config/                  # Configuración principal de Django
+│   ├── usuarios/                # Cuentas, roles y autenticación
+│   ├── clientes/                # Gestión de clientes
+│   ├── productos/               # Categorías, productos y catálogo
+│   ├── pedidos/                 # Pedidos y pagos
+│   ├── inventario/              # Ingredientes y movimientos
+│   ├── reportes/                # Indicadores y exportaciones
 │   ├── manage.py
 │   ├── requirements.txt
-│   ├── .env.example
-├── frontend/                # Interfaz y archivos estáticos
-├── docs/                    # Guías y manuales (si la fase 7 está integrada)
-├── tools/                   # Validación y respaldos (fase 7)
+│   └── .env.example
+├── frontend/
+│   ├── templates/
+│   │   ├── index.html           # Plantilla principal de Django
+│   │   └── partials/
+│   │       ├── acceso/          # Login y registro
+│   │       ├── sesion/          # Inicio tras autenticarse
+│   │       ├── perfil/          # Mi perfil
+│   │       ├── catalogo/        # Catálogo público
+│   │       ├── dashboard/       # Contenedor y navegación del panel
+│   │       ├── modulos/         # Clientes, usuarios, productos, pedidos,
+│   │       │                    # producción, inventario y reportes
+│   │       └── modales/         # Formularios y cuadros de diálogo
+│   └── static/
+│       ├── css/                 # base.css y estilos de cada módulo
+│       └── js/                  # app.js, auth-ui.js y scripts por módulo
+├── docs/                        # Guías y manuales, si están integrados
+├── tools/
+│   ├── modularizar_frontend.py  # Herramienta usada para la reorganización
+│   ├── verificar_frontend_modular.py
+│   └── ...                     # Otras herramientas, si están integradas
 ├── SIGEP.code-workspace
 └── README.md
 ```
 
-**Importante:** en la instalación recomendada, **Django sirve tanto la interfaz como la API** desde `http://127.0.0.1:8000/`. No es necesario abrir `frontend/index.html` con `file://` ni iniciar Live Server.
+**Importante:** **Django sirve tanto la interfaz como la API** desde `http://127.0.0.1:8000/`. No abras `frontend/templates/index.html` con `file://` ni uses Live Server: las plantillas deben procesarse en Django.
+
+## Organización modular del frontend
+
+La estructura anterior concentraba los módulos en `frontend/index.html`. Ahora se utilizan **plantillas parciales de Django** (`{% include %}`) para mantener cada pantalla en su propio archivo sin alterar los identificadores HTML que consumen los scripts existentes.
+
+- **`frontend/templates/index.html`:** punto de entrada de la interfaz; incluye las plantillas parciales y las referencias a recursos estáticos.
+- **`frontend/templates/partials/modulos/`:** vistas de gestión de clientes, usuarios, productos, pedidos, inventario, reportes y áreas operativas.
+- **`frontend/templates/partials/modales/`:** formularios emergentes para altas, ediciones, pagos y otras acciones.
+- **`frontend/static/js/`:** lógica de autenticación, navegación, catálogo y operaciones de cada módulo. El script principal ahora está en `frontend/static/js/app.js`.
+- **`frontend/static/css/`:** estilos generales y específicos, incluido `base.css`.
+
+Django une las plantillas parciales en una sola respuesta HTML; los endpoints REST, la sesión JWT y los permisos por rol siguen funcionando como antes. **No es necesario ejecutar la herramienta de modularización al clonar una versión del repositorio que ya contiene estas carpetas.**
+
+Para verificar la estructura después de realizar cambios en el frontend, desde la **raíz del repositorio** ejecuta:
+
+```powershell
+python tools/verificar_frontend_modular.py
+```
+
+Esta comprobación verifica inclusiones, identificadores y referencias a archivos estáticos, pero **no sustituye** el inicio de Django, las pruebas automatizadas ni una revisión en el navegador.
 
 ## Requisitos
 
@@ -205,7 +245,7 @@ Abre estas direcciones:
 | http://127.0.0.1:8000/admin/ | Panel administrativo de Django |
 | http://127.0.0.1:8000/api/health/ | Comprobación de la API |
 
-El frontend se conecta a `/api/` en el mismo servidor. Detén Django con `Ctrl+C` cuando termines.
+El frontend modular se procesa a partir de `frontend/templates/index.html` y se conecta a `/api/` en el mismo servidor. Los estilos y scripts se cargan desde rutas como `/static/css/base.css` y `/static/js/app.js`. Detén Django con `Ctrl+C` cuando termines.
 
 ### Nota para Linux o macOS
 
@@ -266,6 +306,12 @@ La sesión JWT se puede recuperar al actualizar la **misma pestaña** cuando est
 
 ## Pruebas automatizadas
 
+Antes de ejecutar toda la batería de pruebas, puedes comprobar la estructura del frontend desde la raíz del repositorio:
+
+```powershell
+python tools/verificar_frontend_modular.py
+```
+
 **Las pruebas deben ejecutarse en una base temporal, no en tu base de desarrollo con datos.** Desde `backend/` con el entorno virtual activo:
 
 ```powershell
@@ -283,6 +329,8 @@ finally {
 ```
 
 Django crea y destruye automáticamente su base de pruebas. El bloque `finally` evita que `DB_ENGINE=sqlite` permanezca activo después.
+
+**Nota sobre las pruebas del frontend:** después de la reorganización, las referencias anteriores a `/static/app.js` deben actualizarse a `/static/js/app.js`. Esto incluye la aserción de `FrontendIntegracionTests` en `backend/usuarios/tests.py`; de lo contrario, la prueba puede fallar aunque la página cargue correctamente.
 
 Si tienes integrado el material de la fase 7, desde la **raíz del repositorio** también puedes ejecutar:
 
@@ -322,10 +370,11 @@ Las rutas protegidas requieren un JWT válido y los permisos correspondientes. E
 | `Unknown database 'sigep'` | Crea la base o corrige `DB_NAME`. |
 | `You have unapplied migrations` | Primero verifica qué base está seleccionada; después ejecuta `migrate` solo contra la base correcta. |
 | Login responde `401` con usuarios que sí existen | Comprueba que Django no esté conectado a SQLite y verifica las credenciales. |
-| `TemplateDoesNotExist: index.html` | `backend/` y `frontend/` deben ser carpetas hermanas. |
-| `404 /static/app.js` o estilos ausentes | Comprueba `frontend/`, rutas estáticas y acceso a Internet para los recursos CDN de desarrollo. |
+| `TemplateDoesNotExist: index.html` | Comprueba que exista `frontend/templates/index.html` y que `backend/config/settings.py` tenga configurada la carpeta de plantillas. |
+| `404 /static/js/app.js` o estilos ausentes | Comprueba los archivos de `frontend/static/js/` y `frontend/static/css/` y la configuración de estáticos en Django. Para recursos externos de desarrollo, revisa también la conexión a Internet. |
 | Respuesta `429` durante pruebas | Hay limitación de solicitudes; revisa el aislamiento del throttling en las pruebas, sin desactivarlo globalmente. |
 | Git muestra conflictos en un merge | Resuélvelos y ejecuta las pruebas antes de hacer `push` a `main`. |
+| Prueba de frontend falla al buscar `/static/app.js` | Actualiza la expectativa de `backend/usuarios/tests.py` a `/static/js/app.js`, que es la ruta actual. |
 
 Si ves una base vacía de repente, **no elimines tablas ni vuelvas a crear usuarios**. Primero ejecuta el comando de comprobación de conexión del paso 5 y confirma que Django usa MariaDB en lugar de la base SQLite de pruebas.
 
